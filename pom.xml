@@ -28,11 +28,6 @@
   		<artifactId>flink-connector-kafka</artifactId>
   		<version>0.9.1</version>
 	</dependency>
-	<dependency>
-  		<groupId>org.apache.flink</groupId>
-  		<artifactId>flink-connector-kafka-0.9_2.11</artifactId>
-  		<version>1.0.0</version>
-	</dependency>
   </dependencies>
   <build>
   <finalName>${finalName}</finalName>
@@ -68,19 +63,6 @@
              <target>1.7</target>
          </configuration>
      </plugin>
-     <plugin>
-         <groupId>org.apache.maven.plugins</groupId>
-         <artifactId>maven-jar-plugin</artifactId>
-         <version>2.5</version>
-         <configuration>
-             <archive>
-                 <manifest>
-                     <addClasspath>true</addClasspath>
-                     <mainClass>${main.class}</mainClass>
-                 </manifest>
-             </archive>
-         </configuration>
-     </plugin>
-  </plugins>
+       </plugins>
   </build>
 </project>
