@@ -23,10 +23,15 @@
   		<artifactId>flink-clients_2.11</artifactId>
   		<version>1.0.0</version>
 	</dependency>
-	<dependency>
+	<!-- dependency>
   		<groupId>org.apache.flink</groupId>
   		<artifactId>flink-connector-kafka</artifactId>
   		<version>0.9.1</version>
+	</dependency -->
+	<dependency>
+  		<groupId>org.apache.flink</groupId>
+  		<artifactId>flink-connector-kafka-0.9_2.11</artifactId>
+  		<version>1.0.0</version>
 	</dependency>
   </dependencies>
   <build>
