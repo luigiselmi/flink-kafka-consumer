@@ -1,4 +1,4 @@
-Flink-Kafka-Consumer [![Build Status](https://travis-ci.org/luigiselmi/flink-kafka-consumer.svg?branch=master)](https://travis-ci.org/luigiselmi/flink-kafka-consumer.svg?branch=master)
+Flink-Kafka-Consumer [![Build Status](https://travis-ci.org/luigiselmi/flink-kafka-consumer.svg?branch=master)](https://travis-ci.org/luigiselmi/flink-kafka-consumer)
 =====================
 Flink consumer of a kafka topic of traffic data. 
 
