@@ -1,0 +1,9 @@
+# This file contains the list of files and folder that don't have to be shown in git status after additions or commits 
+
+# ignore the target folder build by maven from the source code
+target/
+
+# ignore the following hidden files and folders
+.classpath
+.project
+.settings/
