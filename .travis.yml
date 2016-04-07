@@ -1,2 +1,12 @@
 language: java
 before_install: mvn install -DskipTests=true -DfinalName=p3-silkdedup-$TRAVIS_TAG
+deploy:
+  provider: releases
+  api_key:
+    secure: XFWHLvqJJLhkT/0xT5CGNPKhKOP1MvK4KATX+TrmkAlKmXK2OmJrxp4kL3FeaVaccwqc7wwZ0WhslZy+t85rpl0TbAZVifeDplfp2SfFc2zaZCDSew04A9vmp6iKv8VNoL4HQ36ykzFGxs8cwjpQ2Vf3iILqniqn/rZZ76qfM903MNwJq/rehJBbBRyAFqXRhnED6QRmoxInYS5EBRTDM5EEUJjMtf8GxH8BRIulwq9lJyLQgtnIpAKWAjY3TUeF1P+Q0bGEDL4zwsA48cDEX7k0Mb1PRruv86oBaJq02ySBWhYdJh6q7N1bxng1ZQEodGUHFCSwdifmHq9Y67f9jgrjY3jeA6NgRhBysZLUl3t3pAoDYxpQisSkxr420STiI0q6H1XqruIp2M/QrRLDFnAt+GsoLPWMtV4b0IN5p6tAFj/9B4GTVFQ+TE6gc33O2evGcLeRZtJolfuwFlODlTHtvLm8Y1AXQvw76TacvwTEaHPlW7NgU//PzqExRIR/DGSw3aOh4BmGxnQ2phkkr6KDd2+pVLhJm2jw7QZ98YqhkirRoelamq60hCr2e/G/+ZfHD2NmE0B39F4P9sSZGub3H3lQVi20ryHVe9kHyQPEl01lmzXPmYp7ufOH/ZGzB1Ldmpfrzz0CyQqr4I4YhgmE9rTkya9t8Br1UVjsrPc=
+  file: target/flink-kafka-consumer-$TRAVIS_TAG-jar-with-dependencies.jar
+  on:
+    repo: luigiselmi/flink-kafka-consumer
+    tags: true
+    all_branches: true
+
