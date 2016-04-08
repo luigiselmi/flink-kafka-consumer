@@ -17,10 +17,6 @@ public class GpsJsonReaderTest {
   GpsJsonReader reader = null;
   String jsonString = "";
   
-  @BeforeClass
-  public static void setUpBeforeClass() throws Exception {
-  }
-
   @Before
   public void setUp() throws Exception {
     reader = new GpsJsonReader();
