@@ -9,6 +9,8 @@ public class GpsRecord {
   private String speed = "";
   private String jsonString;
   
+  public GpsRecord() {};
+  
   public String getJsonString() {
     return jsonString;
   }

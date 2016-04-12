@@ -14,21 +14,18 @@ import org.junit.Test;
 
 public class GpsJsonReaderTest {
 
-  GpsJsonReader reader = null;
   String jsonString = "";
   
   @Before
   public void setUp() throws Exception {
-    reader = new GpsJsonReader();
     
     jsonString = IOUtils.toString(getClass().getResourceAsStream("gps.json"));
-    
     
   }
 
   @Test
   public void testGetGpsRecord() {
-    List<GpsRecord> records = reader.getGpsRecords(jsonString);
+    List<GpsRecord> records = GpsJsonReader.getGpsRecords(jsonString);
     Assert.assertTrue("Wrong records found", "2016-04-08 12:05:47.600".equals(records.get(0).getTimestamp()));
   }
 
