@@ -5,19 +5,32 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple6;
+import org.apache.flink.api.java.tuple.Tuple7;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
+import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
+import org.apache.flink.streaming.api.datastream.WindowedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
+import org.apache.flink.streaming.api.windowing.time.Time;
+import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer09;
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
+import org.apache.flink.util.Collector;
 
 import eu.bde.sc4pilot.json.GpsJsonReader;
 import eu.bde.sc4pilot.json.GpsRecord;
 
 
 public class WindowTrafficData {
+  
+  private static final String TUPLE_KEY = "TAXY";
+  private static final String INPUT_KAFKA_TOPIC = "taxy";
 
   public static void main(String[] args) throws Exception {
 
@@ -26,31 +39,77 @@ public class WindowTrafficData {
     
     StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
     
+    // gets the data (json array) as a string
     DataStreamSource<String> stream = env
-        .addSource(new FlinkKafkaConsumer09<>("taxy", new SimpleStringSchema(), properties));
-        
-    DataStream<List<Tuple2<String,String>>> result = stream.map(new Json2Tuple());
+        .addSource(new FlinkKafkaConsumer09<>(INPUT_KAFKA_TOPIC, new SimpleStringSchema(), properties));
     
-    result.print();
+    // maps the data into Flink tuples    
+    DataStream<Tuple7<String,String,Double,Double,Double,Double,Double>> streamTuples = stream.flatMap(new Json2Tuple());
+    
+    // define an aggregation function (such as average speed) to be applied in a specified window
+    DataStream<Tuple2<String,Double>> averageSpeedStream = streamTuples
+        .keyBy(GpsJsonReader.KEY)
+        .timeWindow(Time.minutes(2),Time.minutes(1))
+        .apply(new AverageSpeed());
+    
+    
+    // write the result in a Kafka topic "taxy_average_speed"
+    averageSpeedStream.print();
     
     env.execute("Window Traffic Data");
   }  
-  
-  public static class Json2Tuple implements MapFunction<String,List<Tuple2<String,String>>> {
+  /**
+   * Transforms the input data, a string containing a json array, into a Flink tuple.
+   * @author luigi
+   *
+   */
+  public static class Json2Tuple implements FlatMapFunction<String, Tuple7<String,String,Double,Double,Double,Double,Double> > {
 
     @Override
-    public List<Tuple2<String,String>> map(String jsonString) throws Exception {
-      ArrayList<Tuple2<String,String>> tuples = new ArrayList<Tuple2<String, String>>();
+    public void flatMap(String jsonString, Collector<Tuple7<String,String,Double,Double,Double,Double,Double>> out) throws Exception {
       ArrayList<GpsRecord> recs = GpsJsonReader.getGpsRecords(jsonString);
       Iterator<GpsRecord> irecs = recs.iterator();
       while (irecs.hasNext()) {
         GpsRecord record = irecs.next();
-        Tuple2<String,String> tp2 = new Tuple2<String,String>();
-        tp2.setField(record.getLat(), 0);
-        tp2.setField(record.getLon(), 1);
-        tuples.add(tp2);
+        Tuple7<String,String,Double,Double,Double,Double,Double> tp7 = new Tuple7<String,String,Double,Double,Double,Double,Double>();
+        tp7.setField(TUPLE_KEY, GpsJsonReader.KEY);
+        tp7.setField(record.getTimestamp(), GpsJsonReader.RECORDED_TIMESTAMP);
+        tp7.setField(record.getLat(), GpsJsonReader.LAT);
+        tp7.setField(record.getLon(), GpsJsonReader.LON);
+        tp7.setField(record.getAltitude(), GpsJsonReader.ALTITUDE);
+        tp7.setField(record.getSpeed(), GpsJsonReader.SPEED);
+        tp7.setField(record.getOrientation(), GpsJsonReader.ORIENTATION);
+        out.collect(tp7);
       }
-      return tuples;
+    }
+    
+  }
+  /**
+   * Aggregation function to calculate the average speed within a time window.
+   * @author luigi
+   *
+   */
+  public static class AverageSpeed implements WindowFunction<
+                  Tuple7<String,String,Double,Double,Double,Double,Double>,
+                  Tuple2<String,Double>,
+                  Tuple,
+                  TimeWindow> {
+
+    @Override
+    public void apply(
+        Tuple key,
+        TimeWindow window,
+        Iterable<Tuple7<String, String, Double, Double, Double, Double, Double>> records,
+        Collector<Tuple2<String, Double>> out) throws Exception {
+      int count = 0;
+      double speedAccumulator = 0.0;
+      for (Tuple7<String, String, Double, Double, Double, Double, Double> record: records){
+        double speed = record.getField(GpsJsonReader.SPEED);
+        count++;
+        speedAccumulator += speed;
+      }
+      double averageSpeed = speedAccumulator / count; 
+      out.collect(new Tuple2<>(TUPLE_KEY,averageSpeed));
     }
     
   }
