@@ -2,52 +2,55 @@ package eu.bde.sc4pilot.json;
 
 public class GpsRecord {
   
+  private double lat = 0.0;
+  private double lon = 0.0;
+  private double altitude = 0.0;
+  private double speed = 0.0;
+  private double orientation = 0.0;
+  private String jsonString; 
   private String timestamp = "";
-  private String lat = "";
-  private String lon = "";
-  private String altitude = "";
-  private String speed = "";
-  private String jsonString;
   
-  public GpsRecord() {};
-  
-  public String getJsonString() {
-    return jsonString;
-  }
-
-  public void setJsonString(String jsonString) {
-    this.jsonString = jsonString;
-  }
-
   public String getTimestamp() {
     return timestamp;
   }
   public void setTimestamp(String timestamp) {
     this.timestamp = timestamp;
   }
-  public String getLat() {
+  public double getLat() {
     return lat;
   }
-  public void setLat(String lat) {
+  public void setLat(double lat) {
     this.lat = lat;
   }
-  public String getLon() {
+  public double getLon() {
     return lon;
   }
-  public void setLon(String lon) {
+  public void setLon(double lon) {
     this.lon = lon;
   }
-  public String getAltitude() {
+  public double getAltitude() {
     return altitude;
   }
-  public void setAltitude(String altitude) {
+  public void setAltitude(double altitude) {
     this.altitude = altitude;
   }
-  public String getSpeed() {
+  public double getSpeed() {
     return speed;
   }
-  public void setSpeed(String speed) {
+  public void setSpeed(double speed) {
     this.speed = speed;
+  }
+  public double getOrientation() {
+    return orientation;
+  }
+  public void setOrientation(double orientation) {
+    this.orientation = orientation;
+  }
+  public String getJsonString() {
+    return jsonString;
+  }
+  public void setJsonString(String jsonString) {
+    this.jsonString = jsonString;
   }
 
 }
