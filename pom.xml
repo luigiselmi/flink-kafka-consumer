@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>sc4pilot</groupId>
-  <artifactId>flink-kafka-consumer</artifactId>
+  <artifactId>pilot-sc4-flink-kafka-consumer</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>Flink Kakfa Consumer</name>
+  <name>Big Data Europe - Pilot SC4 Flink Kakfa Consumer</name>
   <description>A Kafka consumer to process stream data with Flink</description>
     <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
