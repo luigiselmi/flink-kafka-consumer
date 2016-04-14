@@ -1,20 +1,15 @@
 package eu.bde.sc4pilot.flink;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Properties;
-
 import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple6;
 import org.apache.flink.api.java.tuple.Tuple7;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
-import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
-import org.apache.flink.streaming.api.datastream.WindowedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
 import org.apache.flink.streaming.api.windowing.time.Time;
@@ -22,20 +17,34 @@ import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer09;
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
 import org.apache.flink.util.Collector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.io.Resources;
 
 import eu.bde.sc4pilot.json.GpsJsonReader;
 import eu.bde.sc4pilot.json.GpsRecord;
 
 
+
 public class WindowTrafficData {
-  
-  private static final String TUPLE_KEY = "TAXY";
-  private static final String INPUT_KAFKA_TOPIC = "taxy";
+ 
+  private static String INPUT_KAFKA_TOPIC = null;
+  private static final Logger log = LoggerFactory.getLogger(WindowTrafficData.class);
 
   public static void main(String[] args) throws Exception {
-
-    Properties properties = new Properties();
-    properties.setProperty("bootstrap.servers", "localhost:9090");
+    
+    if (args.length < 1) {
+      throw new IllegalArgumentException("Must connect to a Kafka topic that must be passed as first argument. \n");
+    }
+    INPUT_KAFKA_TOPIC = args[0];
+    Properties properties = null;
+    
+    try (InputStream props = Resources.getResource("consumer.props").openStream()) {
+      properties = new Properties();
+      properties.load(props);
+      
+    }
     
     StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
     
@@ -53,7 +62,7 @@ public class WindowTrafficData {
         .apply(new AverageSpeed());
     
     
-    // write the result in a Kafka topic "taxy_average_speed"
+    // write the result to the console or in a Kafka topic
     averageSpeedStream.print();
     
     env.execute("Window Traffic Data");
@@ -72,7 +81,7 @@ public class WindowTrafficData {
       while (irecs.hasNext()) {
         GpsRecord record = irecs.next();
         Tuple7<String,String,Double,Double,Double,Double,Double> tp7 = new Tuple7<String,String,Double,Double,Double,Double,Double>();
-        tp7.setField(TUPLE_KEY, GpsJsonReader.KEY);
+        tp7.setField(INPUT_KAFKA_TOPIC, GpsJsonReader.KEY);
         tp7.setField(record.getTimestamp(), GpsJsonReader.RECORDED_TIMESTAMP);
         tp7.setField(record.getLat(), GpsJsonReader.LAT);
         tp7.setField(record.getLon(), GpsJsonReader.LON);
@@ -109,7 +118,7 @@ public class WindowTrafficData {
         speedAccumulator += speed;
       }
       double averageSpeed = speedAccumulator / count; 
-      out.collect(new Tuple2<>(TUPLE_KEY,averageSpeed));
+      out.collect(new Tuple2<>(INPUT_KAFKA_TOPIC,averageSpeed));
     }
     
   }
