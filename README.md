@@ -26,7 +26,7 @@ The build creates a jar file with all the dependences and the configuration of t
 that manages the topic in the property file, the default port is 9090. To start the producer two arguments must be passed to the application. The first argument is the Kafka topic i.e. the stream 
 from which the data is fetched. The second argument is the time interval in which the aggregation function must be applied. As an example run the following command
 
-    java -jar target/flink-kafka-consumer-0.0.1-SNAPSHOT-jar-with-dependencies.jar taxy 120
+    java -jar target/pilot-sc4-flink-kafka-consumer-0.0.1-SNAPSHOT-jar-with-dependencies.jar taxy 120
 
 The application will start to read the traffic data from the "taxy" topic, aggregate the speed every two minutes and print the result to the console.
 
