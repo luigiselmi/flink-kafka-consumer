@@ -30,14 +30,19 @@ import eu.bde.sc4pilot.json.GpsRecord;
 public class WindowTrafficData {
  
   private static String INPUT_KAFKA_TOPIC = null;
+  private static int TIME_WINDOW = 0;
   private static final Logger log = LoggerFactory.getLogger(WindowTrafficData.class);
 
   public static void main(String[] args) throws Exception {
     
-    if (args.length < 1) {
-      throw new IllegalArgumentException("Must connect to a Kafka topic that must be passed as first argument. \n");
+    if (args.length < 2) {
+      throw new IllegalArgumentException("The application needs two arguments. The first is the name of the kafka topic from which it has to \n"
+          + "fetch the data. The second argument is the size of the window, in seconds, to which the aggregation function must be applied. \n");
     }
+    
     INPUT_KAFKA_TOPIC = args[0];
+    TIME_WINDOW = Integer.parseInt(args[1]);
+    
     Properties properties = null;
     
     try (InputStream props = Resources.getResource("consumer.props").openStream()) {
@@ -58,7 +63,7 @@ public class WindowTrafficData {
     // define an aggregation function (such as average speed) to be applied in a specified window
     DataStream<Tuple2<String,Double>> averageSpeedStream = streamTuples
         .keyBy(GpsJsonReader.KEY)
-        .timeWindow(Time.minutes(2),Time.minutes(1))
+        .timeWindow(Time.seconds(TIME_WINDOW),Time.seconds(TIME_WINDOW))
         .apply(new AverageSpeed());
     
     
