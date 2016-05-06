@@ -39,6 +39,7 @@ public class GpsJsonReader {
           GpsRecord gpsRecord = new GpsRecord();  
           JsonObject jsonRecord = jsonRecords.get(i).getAsJsonObject();
           gpsRecord.setJsonString(jsonString);
+          gpsRecord.setDeviceId(jsonRecord.get("device_random_id").getAsInt());          
           gpsRecord.setTimestamp(jsonRecord.get("recorded_timestamp").getAsString());
           gpsRecord.setLon(jsonRecord.get("lon").getAsDouble());
           gpsRecord.setLat(jsonRecord.get("lat").getAsDouble());
