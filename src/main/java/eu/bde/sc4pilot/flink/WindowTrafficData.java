@@ -10,6 +10,7 @@ import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple7;
 import org.apache.flink.api.java.tuple.Tuple8;
+import org.apache.flink.api.java.tuple.Tuple9;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -68,7 +69,7 @@ public class WindowTrafficData {
     //DataStream<Tuple7<String,String,Double,Double,Double,Double,Double>> streamTuples = stream.flatMap(new Json2Tuple());
     
     // map match locations given as (longitude, latitude) pairs to  streets
-    DataStream<Tuple8<String,String,Double,Double,Double,Double,Double,String>> streamMatchedTuples = stream.flatMap(new MapMatcher());
+    DataStream<Tuple9<Integer,String,Double,Double,Double,Integer,Double,Integer,String>> streamMatchedTuples = stream.flatMap(new MapMatcher());
     
     // define an aggregation function (such as average speed) to be applied in a specified window
     /*
@@ -112,12 +113,12 @@ public class WindowTrafficData {
   /**
    * Match locations to streets
    */
-  public static class MapMatcher implements FlatMapFunction<String,Tuple8<String,String,Double,Double,Double,Double,Double,String> > {
+  public static class MapMatcher implements FlatMapFunction<String,Tuple9<Integer,String,Double,Double,Double,Integer,Double,Integer,String> > {
 
     @Override
     public void flatMap(
         String jsonString,
-        Collector<Tuple8<String, String, Double, Double, Double, Double, Double, String>> out)
+        Collector<Tuple9<Integer, String, Double, Double, Double, Integer, Double, Integer,String>> out)
         throws Exception {
         // parse the string with the json records
         ArrayList<GpsRecord> recs = GpsJsonReader.getGpsRecords(jsonString);
@@ -127,16 +128,17 @@ public class WindowTrafficData {
         Iterator<GpsRecord> imatchedRecs = matchedRecs.iterator();
         while (imatchedRecs.hasNext()) {
           GpsRecord record = imatchedRecs.next();
-          Tuple8<String,String,Double,Double,Double,Double,Double,String> tp8 = new Tuple8<String,String,Double,Double,Double,Double,Double,String>();
-          tp8.setField(record.getDeviceId(), GpsJsonReader.KEY);
-          tp8.setField(record.getTimestamp(), GpsJsonReader.RECORDED_TIMESTAMP);
-          tp8.setField(record.getLat(), GpsJsonReader.LAT);
-          tp8.setField(record.getLon(), GpsJsonReader.LON);
-          tp8.setField(record.getAltitude(), GpsJsonReader.ALTITUDE);
-          tp8.setField(record.getSpeed(), GpsJsonReader.SPEED);
-          tp8.setField(record.getOrientation(), GpsJsonReader.ORIENTATION);
-          tp8.setField(record.getLink(), GpsJsonReader.OSM_LINK);
-          out.collect(tp8);
+          Tuple9<Integer,String,Double,Double,Double,Integer,Double,Integer,String> tp9 = new Tuple9<Integer,String,Double,Double,Double,Integer,Double,Integer,String>();
+          tp9.setField(record.getDeviceId(), GpsJsonReader.KEY);
+          tp9.setField(record.getTimestamp(), GpsJsonReader.RECORDED_TIMESTAMP);
+          tp9.setField(record.getLon(), GpsJsonReader.LON);
+          tp9.setField(record.getLat(), GpsJsonReader.LAT);          
+          tp9.setField(record.getAltitude(), GpsJsonReader.ALTITUDE);
+          tp9.setField(record.getSpeed(), GpsJsonReader.SPEED);
+          tp9.setField(record.getOrientation(), GpsJsonReader.ORIENTATION);
+          tp9.setField(record.getTransfer(), GpsJsonReader.TRANSFER);
+          tp9.setField(record.getLink(), GpsJsonReader.OSM_LINK);
+          out.collect(tp9);
         }
     }
     

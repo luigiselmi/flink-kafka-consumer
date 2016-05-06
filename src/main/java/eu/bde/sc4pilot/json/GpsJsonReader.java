@@ -20,7 +20,7 @@ public class GpsJsonReader {
   public static final int LAT = 3;
   public static final int ALTITUDE = 4;
   public static final int SPEED = 5;
-  public static final int ORIENTATION = 6;
+  public static final int ORIENTATION = 6;  
   public static final int TRANSFER = 7;
   public static final int OSM_LINK = 8;
   
