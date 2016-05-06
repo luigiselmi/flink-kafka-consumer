@@ -72,17 +72,16 @@ public class WindowTrafficData {
     DataStream<Tuple9<Integer,String,Double,Double,Double,Integer,Double,Integer,String>> streamMatchedTuples = stream.flatMap(new MapMatcher());
     
     // define an aggregation function (such as average speed) to be applied in a specified window
-    /*
-    DataStream<Tuple2<String,Double>> averageSpeedStream = streamTuples
+    DataStream<Tuple2<String,Double>> averageSpeedStream = streamMatchedTuples
         .keyBy(GpsJsonReader.KEY)
         .timeWindow(Time.seconds(TIME_WINDOW),Time.seconds(TIME_WINDOW))
         .apply(new AverageSpeed());
-    */
+    
     // print the matched record with the link to a street 
     streamMatchedTuples.print();
     
-    // write the average speed to the console or in a Kafka topic
-    //averageSpeedStream.print();
+    // write the average speed in a time window to the console (or in a Kafka topic)
+    averageSpeedStream.print();
     
     env.execute("Window Traffic Data");
   }  
@@ -148,7 +147,7 @@ public class WindowTrafficData {
    *
    */
   public static class AverageSpeed implements WindowFunction<
-                  Tuple7<String,String,Double,Double,Double,Double,Double>,
+                  Tuple9<Integer,String,Double,Double,Double,Integer,Double,Integer,String>,
                   Tuple2<String,Double>,
                   Tuple,
                   TimeWindow> {
@@ -157,12 +156,12 @@ public class WindowTrafficData {
     public void apply(
         Tuple key,
         TimeWindow window,
-        Iterable<Tuple7<String, String, Double, Double, Double, Double, Double>> records,
+        Iterable<Tuple9<Integer,String,Double,Double,Double,Integer,Double,Integer,String>> records,
         Collector<Tuple2<String, Double>> out) throws Exception {
       int count = 0;
       double speedAccumulator = 0.0;
-      for (Tuple7<String, String, Double, Double, Double, Double, Double> record: records){
-        double speed = record.getField(GpsJsonReader.SPEED);
+      for (Tuple9<Integer,String,Double,Double,Double,Integer,Double,Integer,String> tuple9: records){
+        int speed = tuple9.getField(GpsJsonReader.SPEED);
         count++;
         speedAccumulator += speed;
       }
