@@ -4,10 +4,12 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Properties;
+
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple7;
+import org.apache.flink.api.java.tuple.Tuple8;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -24,9 +26,14 @@ import com.google.common.io.Resources;
 
 import eu.bde.sc4pilot.json.GpsJsonReader;
 import eu.bde.sc4pilot.json.GpsRecord;
+import eu.bde.sc4pilot.mapmatch.MapMatch;
 
 
-
+/**
+ * 
+ * @author Luigi Selmi
+ *
+ */
 public class WindowTrafficData {
  
   private static String INPUT_KAFKA_TOPIC = null;
@@ -58,24 +65,28 @@ public class WindowTrafficData {
         .addSource(new FlinkKafkaConsumer09<>(INPUT_KAFKA_TOPIC, new SimpleStringSchema(), properties));
     
     // maps the data into Flink tuples    
-    DataStream<Tuple7<String,String,Double,Double,Double,Double,Double>> streamTuples = stream.flatMap(new Json2Tuple());
+    //DataStream<Tuple7<String,String,Double,Double,Double,Double,Double>> streamTuples = stream.flatMap(new Json2Tuple());
+    
+    // map match locations given as (longitude, latitude) pairs to  streets
+    DataStream<Tuple8<String,String,Double,Double,Double,Double,Double,String>> streamMatchedTuples = stream.flatMap(new MapMatcher());
     
     // define an aggregation function (such as average speed) to be applied in a specified window
+    /*
     DataStream<Tuple2<String,Double>> averageSpeedStream = streamTuples
         .keyBy(GpsJsonReader.KEY)
         .timeWindow(Time.seconds(TIME_WINDOW),Time.seconds(TIME_WINDOW))
         .apply(new AverageSpeed());
+    */
+    // print the matched record with the link to a street 
+    streamMatchedTuples.print();
     
-    
-    // write the result to the console or in a Kafka topic
-    averageSpeedStream.print();
+    // write the average speed to the console or in a Kafka topic
+    //averageSpeedStream.print();
     
     env.execute("Window Traffic Data");
   }  
   /**
    * Transforms the input data, a string containing a json array, into a Flink tuple.
-   * @author luigi
-   *
    */
   public static class Json2Tuple implements FlatMapFunction<String, Tuple7<String,String,Double,Double,Double,Double,Double> > {
 
@@ -99,8 +110,39 @@ public class WindowTrafficData {
     
   }
   /**
+   * Match locations to streets
+   */
+  public static class MapMatcher implements FlatMapFunction<String,Tuple8<String,String,Double,Double,Double,Double,Double,String> > {
+
+    @Override
+    public void flatMap(
+        String jsonString,
+        Collector<Tuple8<String, String, Double, Double, Double, Double, Double, String>> out)
+        throws Exception {
+        // parse the string with the json records
+        ArrayList<GpsRecord> recs = GpsJsonReader.getGpsRecords(jsonString);
+        MapMatch matcher = new MapMatch();
+        // map match the locations
+        ArrayList<GpsRecord> matchedRecs = matcher.mapMatch(recs, "localhost", 6311);
+        Iterator<GpsRecord> imatchedRecs = matchedRecs.iterator();
+        while (imatchedRecs.hasNext()) {
+          GpsRecord record = imatchedRecs.next();
+          Tuple8<String,String,Double,Double,Double,Double,Double,String> tp8 = new Tuple8<String,String,Double,Double,Double,Double,Double,String>();
+          tp8.setField(record.getDeviceId(), GpsJsonReader.KEY);
+          tp8.setField(record.getTimestamp(), GpsJsonReader.RECORDED_TIMESTAMP);
+          tp8.setField(record.getLat(), GpsJsonReader.LAT);
+          tp8.setField(record.getLon(), GpsJsonReader.LON);
+          tp8.setField(record.getAltitude(), GpsJsonReader.ALTITUDE);
+          tp8.setField(record.getSpeed(), GpsJsonReader.SPEED);
+          tp8.setField(record.getOrientation(), GpsJsonReader.ORIENTATION);
+          tp8.setField(record.getLink(), GpsJsonReader.OSM_LINK);
+          out.collect(tp8);
+        }
+    }
+    
+  }
+  /**
    * Aggregation function to calculate the average speed within a time window.
-   * @author luigi
    *
    */
   public static class AverageSpeed implements WindowFunction<

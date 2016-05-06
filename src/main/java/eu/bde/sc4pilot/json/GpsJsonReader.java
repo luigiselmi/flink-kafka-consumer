@@ -13,7 +13,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class GpsJsonReader {
-  // Position in a Flink Tuple7. Position '0' is reserved for the key
+  // Position in a Flink Tuple. Position '0' is reserved for the key
   public static final int KEY = 0;
   public static final int RECORDED_TIMESTAMP = 1;
   public static final int LON = 2;
@@ -21,6 +21,8 @@ public class GpsJsonReader {
   public static final int ALTITUDE = 4;
   public static final int SPEED = 5;
   public static final int ORIENTATION = 6;
+  public static final int TRANSFER = 7;
+  public static final int OSM_LINK = 8;
   
   /**
    * Gps data are available as a Json array or records.
@@ -41,7 +43,7 @@ public class GpsJsonReader {
           gpsRecord.setLon(jsonRecord.get("lon").getAsDouble());
           gpsRecord.setLat(jsonRecord.get("lat").getAsDouble());
           gpsRecord.setAltitude(jsonRecord.get("altitude").getAsDouble());
-          gpsRecord.setSpeed(jsonRecord.get("speed").getAsDouble());
+          gpsRecord.setSpeed(jsonRecord.get("speed").getAsInt());
           gpsRecord.setOrientation(jsonRecord.get("orientation").getAsDouble());
           gpsRecords.add(gpsRecord);
         }
