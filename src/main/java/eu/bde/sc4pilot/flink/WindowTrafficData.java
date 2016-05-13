@@ -8,6 +8,8 @@ import java.util.Properties;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.api.java.tuple.Tuple7;
 import org.apache.flink.api.java.tuple.Tuple8;
 import org.apache.flink.api.java.tuple.Tuple9;
@@ -71,17 +73,19 @@ public class WindowTrafficData {
     // map match locations given as (longitude, latitude) pairs to  streets
     DataStream<Tuple9<Integer,String,Double,Double,Double,Integer,Double,Integer,String>> streamMatchedTuples = stream.flatMap(new MapMatcher());
     
-    // define an aggregation function (such as average speed) to be applied in a specified window
-    DataStream<Tuple2<String,Double>> averageSpeedStream = streamMatchedTuples
-        .keyBy(GpsJsonReader.KEY)
-        .timeWindow(Time.seconds(TIME_WINDOW),Time.seconds(TIME_WINDOW))
+    // define an aggregation function (such as average speed per road segment) to be applied in a specified window
+    DataStream<Tuple4<String,Double,String,Integer>> averageSpeedStream = streamMatchedTuples
+        .keyBy(GpsJsonReader.OSM_LINK)
+        .timeWindow(Time.seconds(TIME_WINDOW),Time.seconds(60))
         .apply(new AverageSpeed());
     
     // print the matched record with the link to a street 
     streamMatchedTuples.print();
     
     // write the average speed in a time window to the console (or in a Kafka topic)
+    // topic name, average speed in the road segment, road segment identifier, number of gps messages in the time window
     averageSpeedStream.print();
+    
     
     env.execute("Window Traffic Data");
   }  
@@ -144,11 +148,16 @@ public class WindowTrafficData {
   }
   /**
    * Aggregation function to calculate the average speed within a time window.
+   * It returns 
+   * 1) the topic name
+   * 2) the average speed in a road segment within the time window set
+   * 3) the road segment identifier (from OpenStreetMap)
+   * 4) the number of records used, that is the number of times a taxy sent a gps message from that same road segment
    *
    */
   public static class AverageSpeed implements WindowFunction<
                   Tuple9<Integer,String,Double,Double,Double,Integer,Double,Integer,String>,
-                  Tuple2<String,Double>,
+                  Tuple4<String,Double,String,Integer>,
                   Tuple,
                   TimeWindow> {
 
@@ -157,16 +166,18 @@ public class WindowTrafficData {
         Tuple key,
         TimeWindow window,
         Iterable<Tuple9<Integer,String,Double,Double,Double,Integer,Double,Integer,String>> records,
-        Collector<Tuple2<String, Double>> out) throws Exception {
+        Collector<Tuple4<String, Double, String, Integer>> out) throws Exception {
       int count = 0;
+      String roadSegmentId = "N/A"; // OpenStreetMap identifier of a road segment (between two junctions)
       double speedAccumulator = 0.0;
       for (Tuple9<Integer,String,Double,Double,Double,Integer,Double,Integer,String> tuple9: records){
         int speed = tuple9.getField(GpsJsonReader.SPEED);
         count++;
         speedAccumulator += speed;
+        roadSegmentId = tuple9.getField(GpsJsonReader.OSM_LINK);
       }
       double averageSpeed = speedAccumulator / count; 
-      out.collect(new Tuple2<>(INPUT_KAFKA_TOPIC,averageSpeed));
+      out.collect(new Tuple4<>(INPUT_KAFKA_TOPIC,averageSpeed, roadSegmentId,count));
     }
     
   }
