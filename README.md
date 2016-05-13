@@ -28,7 +28,7 @@ from which the data is fetched. The second argument is the time interval in whic
 
     java -jar target/pilot-sc4-flink-kafka-consumer-0.0.1-SNAPSHOT-jar-with-dependencies.jar taxy 120
 
-The application will start to read the traffic data from the "taxy" topic, aggregate the speed every two minutes and print the result to the console.
+The application will start to read the traffic data from the "taxy" topic, aggregate the speed of taxies every two minutes in road segments in which the taxies are localized, and print the result (average speed per road segment in the time window) to the console.
 
 ##Usage 
 section with a description and examples of the main use cases and the APIs exposed by the software
