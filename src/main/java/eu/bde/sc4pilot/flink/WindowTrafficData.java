@@ -13,6 +13,7 @@ import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.api.java.tuple.Tuple7;
 import org.apache.flink.api.java.tuple.Tuple8;
 import org.apache.flink.api.java.tuple.Tuple9;
+import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -39,19 +40,23 @@ import eu.bde.sc4pilot.mapmatch.MapMatch;
  */
 public class WindowTrafficData {
  
-  private static String INPUT_KAFKA_TOPIC = null;
-  private static int TIME_WINDOW = 0;
+  private static String KAFKA_TOPIC_PARAM_NAME = "topic";
+  private static String KAFKA_TOPIC_PARAM_VALUE = null;
+  private static String TIME_WINDOW_PARAM_NAME = "window";
+  private static int TIME_WINDOW_PARAM_VALUE = 0;
   private static final Logger log = LoggerFactory.getLogger(WindowTrafficData.class);
 
   public static void main(String[] args) throws Exception {
+	  
+	ParameterTool parameter = ParameterTool.fromArgs(args);
     
-    if (args.length < 2) {
+    if (parameter.getNumberOfParameters() < 2) {
       throw new IllegalArgumentException("The application needs two arguments. The first is the name of the kafka topic from which it has to \n"
           + "fetch the data. The second argument is the size of the window, in seconds, to which the aggregation function must be applied. \n");
     }
     
-    INPUT_KAFKA_TOPIC = args[0];
-    TIME_WINDOW = Integer.parseInt(args[1]);
+    KAFKA_TOPIC_PARAM_VALUE = parameter.get(KAFKA_TOPIC_PARAM_NAME);
+    TIME_WINDOW_PARAM_VALUE = parameter.getInt(TIME_WINDOW_PARAM_NAME, TIME_WINDOW_PARAM_VALUE);
     
     Properties properties = null;
     
@@ -65,7 +70,7 @@ public class WindowTrafficData {
     
     // gets the data (json array) as a string
     DataStreamSource<String> stream = env
-        .addSource(new FlinkKafkaConsumer09<>(INPUT_KAFKA_TOPIC, new SimpleStringSchema(), properties));
+        .addSource(new FlinkKafkaConsumer09<>(KAFKA_TOPIC_PARAM_VALUE, new SimpleStringSchema(), properties));
     
     // maps the data into Flink tuples    
     //DataStream<Tuple7<String,String,Double,Double,Double,Double,Double>> streamTuples = stream.flatMap(new Json2Tuple());
@@ -76,7 +81,7 @@ public class WindowTrafficData {
     // define an aggregation function (such as average speed per road segment) to be applied in a specified window
     DataStream<Tuple4<String,Double,String,Integer>> averageSpeedStream = streamMatchedTuples
         .keyBy(GpsJsonReader.OSM_LINK)
-        .timeWindow(Time.seconds(TIME_WINDOW),Time.seconds(60))
+        .timeWindow(Time.seconds(TIME_WINDOW_PARAM_VALUE),Time.seconds(60))
         .apply(new AverageSpeed());
     
     // print the matched record with the link to a street 
@@ -101,7 +106,7 @@ public class WindowTrafficData {
       while (irecs.hasNext()) {
         GpsRecord record = irecs.next();
         Tuple7<String,String,Double,Double,Double,Double,Double> tp7 = new Tuple7<String,String,Double,Double,Double,Double,Double>();
-        tp7.setField(INPUT_KAFKA_TOPIC, GpsJsonReader.KEY);
+        tp7.setField(KAFKA_TOPIC_PARAM_VALUE, GpsJsonReader.KEY);
         tp7.setField(record.getTimestamp(), GpsJsonReader.RECORDED_TIMESTAMP);
         tp7.setField(record.getLat(), GpsJsonReader.LAT);
         tp7.setField(record.getLon(), GpsJsonReader.LON);
@@ -177,7 +182,7 @@ public class WindowTrafficData {
         roadSegmentId = tuple9.getField(GpsJsonReader.OSM_LINK);
       }
       double averageSpeed = speedAccumulator / count; 
-      out.collect(new Tuple4<>(INPUT_KAFKA_TOPIC,averageSpeed, roadSegmentId,count));
+      out.collect(new Tuple4<>(KAFKA_TOPIC_PARAM_VALUE,averageSpeed, roadSegmentId,count));
     }
     
   }
