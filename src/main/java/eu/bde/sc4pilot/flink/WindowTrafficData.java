@@ -1,17 +1,21 @@
 package eu.bde.sc4pilot.flink;
 
 import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.common.functions.RuntimeContext;
 import org.apache.flink.api.java.tuple.Tuple;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.api.java.tuple.Tuple7;
-import org.apache.flink.api.java.tuple.Tuple8;
 import org.apache.flink.api.java.tuple.Tuple9;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -20,6 +24,8 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
+import org.apache.flink.streaming.connectors.elasticsearch.ElasticsearchSink;
+import org.apache.flink.streaming.connectors.elasticsearch.IndexRequestBuilder;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer09;
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
 import org.apache.flink.util.Collector;
@@ -31,6 +37,11 @@ import com.google.common.io.Resources;
 import eu.bde.sc4pilot.json.GpsJsonReader;
 import eu.bde.sc4pilot.json.GpsRecord;
 import eu.bde.sc4pilot.mapmatch.MapMatch;
+
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.client.Requests;
+import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.common.transport.TransportAddress;
 
 
 /**
@@ -91,9 +102,42 @@ public class WindowTrafficData {
     // topic name, average speed in the road segment, road segment identifier, number of gps messages in the time window
     averageSpeedStream.print();
     
+    // Save gps data into Elasticsearch
+    saveGpsData(streamMatchedTuples);
+    
     
     env.execute("Window Traffic Data");
-  }  
+  } 
+  /*
+   * Save the data into Elasticsearch (v.1.7.3)
+   */
+  public static void saveGpsData(DataStream<Tuple9<Integer,String,Double,Double,Double,Integer,Double,Integer,String>> inputStream) throws UnknownHostException {
+	  Map<String, String> config = new HashMap<>();
+	// This instructs the sink to emit after every element, otherwise they would be buffered
+	config.put("bulk.flush.max.actions", "1");
+	config.put("cluster.name", "elasticsearch-in-action");
+	
+	List<TransportAddress> transports = new ArrayList<TransportAddress>();
+	transports.add(new InetSocketTransportAddress("127.0.0.1", 9300));
+	//transports.add(new InetSocketTransportAddress("node-2", 9300));
+
+	inputStream.addSink(new ElasticsearchSink<Tuple9<Integer,String,Double,Double,Double,Integer,Double,Integer,String>>(config, transports, new IndexRequestBuilder<Tuple9<Integer,String,Double,Double,Double,Integer,Double,Integer,String>>() {
+		@Override
+		public IndexRequest createIndexRequest(
+				Tuple9<Integer, String, Double, Double, Double, Integer, Double, Integer, String> gpsrecord,
+				RuntimeContext ctx) {
+			Map<String, Object> json = new HashMap<>();
+	        json.put("data", gpsrecord);
+
+	        return Requests.indexRequest()
+	                .index("thessaloniki")
+	                .type("floating-cars")
+	                .source(json);
+
+		}
+	}));
+  }
+
   /**
    * Transforms the input data, a string containing a json array, into a Flink tuple.
    */
@@ -187,4 +231,5 @@ public class WindowTrafficData {
     
   }
   
+    
 }
