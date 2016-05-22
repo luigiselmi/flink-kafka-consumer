@@ -106,16 +106,16 @@ public class WindowTrafficData {
     saveGpsData(streamMatchedTuples);
     
     
-    env.execute("Window Traffic Data");
+    env.execute("Thessaloniki Floating Cars Data");
   } 
   /*
-   * Save the data into Elasticsearch (v.1.7.3)
+   * Save the gps records plus the road segment identifiers from the map match into Elasticsearch (v.1.7.3)
    */
   public static void saveGpsData(DataStream<Tuple9<Integer,String,Double,Double,Double,Integer,Double,Integer,String>> inputStream) throws UnknownHostException {
 	  Map<String, String> config = new HashMap<>();
 	// This instructs the sink to emit after every element, otherwise they would be buffered
 	config.put("bulk.flush.max.actions", "1");
-	config.put("cluster.name", "elasticsearch-in-action");
+	config.put("cluster.name", "pilot-sc4");
 	
 	List<TransportAddress> transports = new ArrayList<TransportAddress>();
 	transports.add(new InetSocketTransportAddress("127.0.0.1", 9300));
@@ -127,7 +127,14 @@ public class WindowTrafficData {
 				Tuple9<Integer, String, Double, Double, Double, Integer, Double, Integer, String> gpsrecord,
 				RuntimeContext ctx) {
 			Map<String, Object> json = new HashMap<>();
-	        json.put("data", gpsrecord);
+	        json.put("id", gpsrecord.getField(0));
+	        json.put("timestamp", gpsrecord.getField(1));
+	        json.put("location", String.valueOf(gpsrecord.getField(3)) + "," + String.valueOf(gpsrecord.getField(2))); // lat,lon
+	        json.put("altitude", gpsrecord.getField(4));
+	        json.put("speed", gpsrecord.getField(5));
+	        json.put("orientation", gpsrecord.getField(6));
+	        json.put("transfer", gpsrecord.getField(7));
+	        json.put("roadsegment", gpsrecord.getField(8));
 
 	        return Requests.indexRequest()
 	                .index("thessaloniki")
