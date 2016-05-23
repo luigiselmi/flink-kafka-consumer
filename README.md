@@ -39,8 +39,7 @@ called mapping in Elasticsearch, must be created to inform Elasticsearch the dat
     
 Elasticsearch is now ready to store and index the json data. The data stored in Elasticsearch can be easily visualized using Kibana. The version supported by Elasticsearch 1.7.3 is [Kibana 4.1.3](https://www.elastic.co/downloads/past-releases/kibana-4-1-3). 
 Once Kibana is installed and start, an index pattern must be defined so that Kibana can find and retrieve the data from Elasticsearch. The index pattern must match with the index name used. In our example the index name is "thessaloniki" as in the path used
-to create the index. Please follow the instruction in [Getting started with Kibana](https://www.elastic.co/guide/en/kibana/current/getting-started.html) to learn how to create different types of visualizations such as vertical bar charts, pie charts, tile maps  
-and more. 
+to create the index. Please follow the instruction in [Getting started with Kibana](https://www.elastic.co/guide/en/kibana/current/getting-started.html) to learn how to create different types of visualizations such as vertical bar charts, pie charts, tile maps and more. 
  
 
 ##License 
