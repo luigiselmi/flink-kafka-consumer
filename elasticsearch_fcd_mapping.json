@@ -1,0 +1,16 @@
+{
+  "floating-cars" : {
+    "properties" : {
+       "id" : {"type": "integer"},
+       "timestamp" : {"type": "date",
+                      "format": "YYYY-MM-DD HH:mm:ss.SSS"},
+       "location" : {"type": "geo_point"},
+       "altitude" : {"type": "double"},
+       "speed" : {"type": "integer"},
+       "orientation" : {"type": "double"},
+       "transfer" : {"type": "integer"},
+       "roadsegment" : {"type": "string",
+                        "index": "not_analyzed"}
+    }
+  }
+}
