@@ -12,9 +12,9 @@ This project is a component of the pilot that address the 4th H2020 Societal Cha
 The pilot will provide a scalable and fault tolerant system to collect, process and store the data from sensors: GPS data from 
 cabs and data from Bluetooth sensors in the city of Thessaloniki, Greece.
 
-##Requirements 
+##Dependencies 
 The job reads the data from a Kafka topic so Apache Kafka must be installed and run as explained in [Apache Kafka Quick Start](http://kafka.apache.org/documentation.html#quickstart).
-The data stream is fed by a consumer that fetches traffic data from the cabs in Thessaloniki, Greece. The software for the consumer is available on Github in the [kafka-client](https://github.com/luigiselmi/kafka-clients) repositoy.   
+The data stream is fed by a consumer that fetches traffic data from the cabs in Thessaloniki, Greece. The software for the producer is available on Github in the [pilot-sc4-kafka-producer](https://github.com/big-data-europe/pilot-sc4-kafka-producer) repositoy. The job depends also on a Rserve server that receives R commands for a map matching algorithm and on Elasticsearch for the storage.   
 
 ##Build 
 The software is based on Maven and can be build from the project root folder simply running the command
@@ -29,7 +29,10 @@ from which the data is fetched. The other argument is the time interval in which
     java -jar target/pilot-sc4-flink-kafka-consumer-0.0.1-SNAPSHOT-jar-with-dependencies.jar --topic taxy --window 120
 
 The job will start to read the traffic data from the "taxy" topic, aggregate the speed of taxies every two minutes in road segments in which the taxies are localized, and print the result (average speed per road segment in the time window) to the console.
-The job can also be started from the Flink JobManager, see the [Flink JobManager Quick Star Setup](https://ci.apache.org/projects/flink/flink-docs-release-1.0/quickstart/setup_quickstart.html) to learn how to do it.
+The job can also be started from the Flink JobManager, see the [Flink JobManager Quick Star Setup](https://ci.apache.org/projects/flink/flink-docs-release-1.0/quickstart/setup_quickstart.html) to learn how to do it. Once Flink is started you can submit a job uploading the project jar file and setting the following parameters
+
+    Entry Class: eu.bde.sc4pilot.flink.WindowTrafficData
+    Program Arguments: --topic taxy --window 120
 
 ##Usage 
 The job saves the data into Elasticsearch, a document database for json data. The version supported by Apache Flink is [Elasticsearch 1.7.3](https://www.elastic.co/downloads/past-releases/elasticsearch-1-7-3). Once it has been installed and started a schema,
