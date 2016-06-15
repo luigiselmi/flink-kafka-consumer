@@ -14,7 +14,7 @@ cabs and data from Bluetooth sensors in the city of Thessaloniki, Greece.
 
 ##Dependencies 
 The job reads the data from a Kafka topic so Apache Kafka must be installed and run as explained in [Apache Kafka Quick Start](http://kafka.apache.org/documentation.html#quickstart).
-The data stream is fed by a consumer that fetches traffic data from the cabs in Thessaloniki, Greece. The software for the producer is available on Github in the [pilot-sc4-kafka-producer](https://github.com/big-data-europe/pilot-sc4-kafka-producer) repositoy. The job depends also on a Rserve server that receives R commands for a map matching algorithm and on Elasticsearch for the storage.   
+The data stream is fed by a consumer that fetches traffic data from the cabs in Thessaloniki, Greece. The software for the producer is available on Github in the [pilot-sc4-kafka-producer](https://github.com/big-data-europe/pilot-sc4-kafka-producer) repositoy. The job depends also on a Rserve server that receives R commands for a map matching algorithm. The project for the Rserve is [pilot-sc4-docker-r](https://github.com/big-data-europe/pilot-sc4-docker-r). Finally an instance of Elasticsearch must be started for the storage.   
 
 ##Build 
 The software is based on Maven and can be build from the project root folder simply running the command
