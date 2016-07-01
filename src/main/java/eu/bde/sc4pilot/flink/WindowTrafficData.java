@@ -18,6 +18,7 @@ import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.api.java.tuple.Tuple7;
 import org.apache.flink.api.java.tuple.Tuple9;
 import org.apache.flink.api.java.utils.ParameterTool;
+import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -78,6 +79,9 @@ public class WindowTrafficData {
     }
     
     StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+    
+    // set the time characteristic to include an event in a window (event time|ingestion time|processing time) 
+    env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime);
     
     // gets the data (json array) as a string
     DataStreamSource<String> stream = env
@@ -208,7 +212,7 @@ public class WindowTrafficData {
    * 1) the topic name
    * 2) the average speed in a road segment within the time window set
    * 3) the road segment identifier (from OpenStreetMap)
-   * 4) the number of records used, that is the number of times a taxy sent a gps message from that same road segment
+   * 4) the number of records used, that is the number of times a taxi sent a gps message from that same road segment
    *
    */
   public static class AverageSpeed implements WindowFunction<
