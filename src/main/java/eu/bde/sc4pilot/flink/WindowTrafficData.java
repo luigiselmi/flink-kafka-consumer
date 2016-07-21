@@ -83,7 +83,7 @@ public class WindowTrafficData {
     // set the time characteristic to include an event in a window (event time|ingestion time|processing time) 
     env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime);
     
-    // gets the data (json array) as a string
+    // gets the data from the kafka topic (json array) as a string
     DataStreamSource<String> stream = env
         .addSource(new FlinkKafkaConsumer09<>(KAFKA_TOPIC_PARAM_VALUE, new SimpleStringSchema(), properties));
     
@@ -108,7 +108,7 @@ public class WindowTrafficData {
     
     // Save gps data into Elasticsearch
     saveGpsData(streamMatchedTuples);
-    
+   
     
     env.execute("Thessaloniki Floating Cars Data");
   } 
