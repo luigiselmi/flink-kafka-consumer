@@ -45,7 +45,7 @@ and then send the schema using the command
     curl -XPUT "http://localhost:9200/thessaloniki/_mapping/floating-cars" -d @elasticsearch_fcd_mapping.json
     
 Elasticsearch is now ready to store and index the json data. Before starting the consumer check the value of the property 'cluster.name' in the Elasticsearch configuration file 'elasticsearch.yml'. 
-The same value key-value pair, e.g cluster.name: pilot-sc4, must be used in the consumer's configuration paramaters. 
+The same key-value pair, e.g cluster.name: pilot-sc4, must be used in the consumer's configuration paramaters. 
 
 The data stored in Elasticsearch can be easily visualized using Kibana. The version supported by Elasticsearch 1.7.3 is [Kibana 4.1.3](https://www.elastic.co/downloads/past-releases/kibana-4-1-3). 
 Once Kibana is installed and start, an index pattern must be defined so that Kibana can find and retrieve the data from Elasticsearch. The index pattern must match with the index name used. In our example the index name is "thessaloniki" as in the path used
