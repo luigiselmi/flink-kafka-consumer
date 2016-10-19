@@ -35,8 +35,11 @@ The job can also be started from the Flink JobManager, see the [Flink JobManager
     Program Arguments: --topic taxi --window 120
 
 ##Usage 
-The job saves the data into Elasticsearch, a document database for json data. The version supported by Apache Flink is [Elasticsearch 1.7.3](https://www.elastic.co/downloads/past-releases/elasticsearch-1-7-3). Once it has been installed and started a schema,
-called mapping in Elasticsearch, must be created to inform Elasticsearch the data types used and to index the fields. Currently a mapping is available to store the Floating Cars Data. In  order to create the index, e.g. "thessaloniki", use the command 
+The job saves the data into Elasticsearch, a document database for json data. The version supported by Apache Flink is [Elasticsearch 1.7.3](https://www.elastic.co/downloads/past-releases/elasticsearch-1-7-3). Install Elasticsearch and start it from the root folder
+
+    $ ./bin/elasticsearch
+
+Once Elasticsearch has started a schema,called mapping in Elasticsearch, must be created to inform Elasticsearch the data types used and to index the fields. Currently a mapping is available to store the Floating Cars Data. In  order to create the index, e.g. "thessaloniki", use the command 
 
     curl -XPUT 'localhost:9200/thessaloniki'
 
