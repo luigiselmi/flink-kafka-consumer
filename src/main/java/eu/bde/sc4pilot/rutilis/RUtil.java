@@ -152,7 +152,7 @@ public class RUtil {
     int recordNumber = 0;
     while (igpsrecords.hasNext()) {
       GpsRecord gpsrecord = igpsrecords.next();
-      deviceId[recordNumber] = Integer.valueOf(gpsrecord.getDeviceId());
+      deviceId[recordNumber] = Integer.valueOf( gpsrecord.getDeviceId() );
       insertedTimestamp[recordNumber] = gpsrecord.getTimestamp();
       longitude[recordNumber] = gpsrecord.getLon();
       latitude[recordNumber] = gpsrecord.getLat();
