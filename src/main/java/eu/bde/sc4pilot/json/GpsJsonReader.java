@@ -58,28 +58,4 @@ public class GpsJsonReader {
     return gpsRecords;
   }
   
-  public static List<Tuple6<String,String,String,String,String,String>> getGpsTuples(String jsonString) {
-    ArrayList<Tuple6<String,String,String,String,String,String>> gpsRecords = new ArrayList<Tuple6<String,String,String,String,String,String>>();
-    JsonParser parser = new JsonParser();
-    JsonElement element = parser.parse(jsonString);
-    Tuple6<String,String,String,String,String,String> tp6 = null;
-    if (element.isJsonArray()) {
-        JsonArray jsonRecords = element.getAsJsonArray();        
-        for (int i = 0; i < jsonRecords.size(); i++) {
-          tp6 = new Tuple6<String, String, String, String, String, String>();
-          JsonObject jsonRecord = jsonRecords.get(i).getAsJsonObject();          
-          tp6.setField(jsonRecord.get("recorded_timestamp").getAsString(), RECORDED_TIMESTAMP);
-          tp6.setField(jsonRecord.get("lon").getAsString(), LON);
-          tp6.setField(jsonRecord.get("lat").getAsString(), LAT);
-          tp6.setField(jsonRecord.get("altitude").getAsString(), ALTITUDE);
-          tp6.setField(jsonRecord.get("speed").getAsString(), SPEED);
-          tp6.setField(jsonRecord.get("orientation").getAsString(), ORIENTATION);
-          gpsRecords.add(tp6);
-        }
-    }
-   
-    return gpsRecords;
-  }
-  
-  
 }
