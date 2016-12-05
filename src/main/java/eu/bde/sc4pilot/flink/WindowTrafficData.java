@@ -1,8 +1,6 @@
 package eu.bde.sc4pilot.flink;
 
 import java.io.InputStream;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -152,6 +150,7 @@ public class WindowTrafficData {
   /**
    * Transforms the input data, a string containing a json array, into a Flink tuple.
    */
+  /*
   public static class Json2Tuple implements FlatMapFunction<String, Tuple7<String,String,Double,Double,Double,Double,Double> > {
 
     @Override
@@ -173,6 +172,7 @@ public class WindowTrafficData {
     }
     
   }
+  */
   /**
    * Match locations to streets
    */
