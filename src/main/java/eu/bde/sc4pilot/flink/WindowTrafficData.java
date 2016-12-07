@@ -85,13 +85,10 @@ public class WindowTrafficData {
     DataStreamSource<String> stream = env
         .addSource(new FlinkKafkaConsumer09<>(KAFKA_TOPIC_PARAM_VALUE, new SimpleStringSchema(), properties));
     
-    // maps the data into Flink tuples    
-    //DataStream<Tuple7<String,String,Double,Double,Double,Double,Double>> streamTuples = stream.flatMap(new Json2Tuple());
-    
     // map match locations given as (longitude, latitude) pairs to  streets
     DataStream<Tuple9<Integer,String,Double,Double,Double,Integer,Double,Integer,String>> streamMatchedTuples = stream.flatMap(new MapMatcher());
     
-    // define an aggregation function (such as average speed per road segment) to be applied in a specified window
+    // define an aggregation function (such as average speed per road segment) to be applied within a specified window on a keyed stream
     DataStream<Tuple4<String,Double,String,Integer>> averageSpeedStream = streamMatchedTuples
         .keyBy(GpsJsonReader.OSM_LINK)
         .timeWindow(Time.seconds(TIME_WINDOW_PARAM_VALUE),Time.seconds(60))
@@ -147,32 +144,6 @@ public class WindowTrafficData {
 	}));
   }
 
-  /**
-   * Transforms the input data, a string containing a json array, into a Flink tuple.
-   */
-  /*
-  public static class Json2Tuple implements FlatMapFunction<String, Tuple7<String,String,Double,Double,Double,Double,Double> > {
-
-    @Override
-    public void flatMap(String jsonString, Collector<Tuple7<String,String,Double,Double,Double,Double,Double>> out) throws Exception {
-      ArrayList<GpsRecord> recs = GpsJsonReader.getGpsRecords(jsonString);
-      Iterator<GpsRecord> irecs = recs.iterator();
-      while (irecs.hasNext()) {
-        GpsRecord record = irecs.next();
-        Tuple7<String,String,Double,Double,Double,Double,Double> tp7 = new Tuple7<String,String,Double,Double,Double,Double,Double>();
-        tp7.setField(KAFKA_TOPIC_PARAM_VALUE, GpsJsonReader.KEY);
-        tp7.setField(record.getTimestamp(), GpsJsonReader.RECORDED_TIMESTAMP);
-        tp7.setField(record.getLat(), GpsJsonReader.LAT);
-        tp7.setField(record.getLon(), GpsJsonReader.LON);
-        tp7.setField(record.getAltitude(), GpsJsonReader.ALTITUDE);
-        tp7.setField(record.getSpeed(), GpsJsonReader.SPEED);
-        tp7.setField(record.getOrientation(), GpsJsonReader.ORIENTATION);
-        out.collect(tp7);
-      }
-    }
-    
-  }
-  */
   /**
    * Match locations to streets
    */
