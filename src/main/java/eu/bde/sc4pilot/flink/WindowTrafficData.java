@@ -44,7 +44,15 @@ import org.elasticsearch.common.transport.TransportAddress;
 
 
 /**
- * 
+ * This class provides the execution plan of a Flink job for the map matching of taxis 
+ * to the road segments and an aggregation functions for the computation of the average
+ * speed on a road segment within a time window.
+ * Flink subtasks list:
+ * 1) source(), read the data from a Kafka topic
+ * 2) map(), map-match the vehicles to the road segments
+ * 3) keyBy(road_segment_id).window(5 min.).apply(average_speed), compute the average speed 
+ * 4) sink(), store the data in Elasticsearch
+ *  
  * @author Luigi Selmi
  *
  */
@@ -81,9 +89,12 @@ public class WindowTrafficData {
     // set the time characteristic to include an event in a window (event time|ingestion time|processing time) 
     env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime);
     
+    FlinkKafkaConsumer09<String> consumer = 
+        new FlinkKafkaConsumer09<>(KAFKA_TOPIC_PARAM_VALUE, new SimpleStringSchema(), properties);
+    
     // gets the data from the kafka topic (json array) as a string
     DataStreamSource<String> stream = env
-        .addSource(new FlinkKafkaConsumer09<>(KAFKA_TOPIC_PARAM_VALUE, new SimpleStringSchema(), properties));
+        .addSource(consumer);
     
     // map match locations given as (longitude, latitude) pairs to  streets
     DataStream<Tuple9<Integer,String,Double,Double,Double,Integer,Double,Integer,String>> streamMatchedTuples = stream.flatMap(new MapMatcher());

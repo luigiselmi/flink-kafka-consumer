@@ -9,24 +9,30 @@
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <maven.compiler.source>1.7</maven.compiler.source>
       <maven.compiler.target>1.7</maven.compiler.target>
+      <flink.version>1.2.0</flink.version>
       <main.class>eu.bde.sc4pilot.flink.WindowTrafficData</main.class>
       <finalName>${project.artifactId}-${project.version}</finalName>
   </properties>
   <dependencies>
+    <dependency>
+			<groupId>org.apache.flink</groupId>
+			<artifactId>flink-java</artifactId>
+			<version>${flink.version}</version>
+		</dependency>
    	<dependency>
   		<groupId>org.apache.flink</groupId>
-  		<artifactId>flink-streaming-java_2.11</artifactId>
-  		<version>1.0.0</version>
+  		<artifactId>flink-streaming-java_2.10</artifactId>
+  		<version>${flink.version}</version>
    	</dependency> 
 	<dependency>
   		<groupId>org.apache.flink</groupId>
-  		<artifactId>flink-clients_2.11</artifactId>
-  		<version>1.0.0</version>
+  		<artifactId>flink-clients_2.10</artifactId>
+  		<version>${flink.version}</version>
 	</dependency>
 	<dependency>
   		<groupId>org.apache.flink</groupId>
-  		<artifactId>flink-connector-kafka-0.9_2.11</artifactId>
-  		<version>1.0.0</version>
+  		<artifactId>flink-connector-kafka-0.10_2.10</artifactId>
+			<version>${flink.version}</version>
 	</dependency>
 	<dependency>
       <groupId>net.rforge</groupId>
@@ -80,6 +86,16 @@
 	   <artifactId>joda-time</artifactId>
 	   <version>2.7</version>
 	</dependency>
+	<dependency>
+        <groupId>org.apache.avro</groupId>
+        <artifactId>avro</artifactId>
+        <version>1.8.1</version>
+      </dependency>
+      <dependency>
+        <groupId>com.twitter</groupId>
+        <artifactId>bijection-avro_2.10</artifactId>
+        <version>0.9.2</version>
+      </dependency>
   </dependencies>
   <build>
   <finalName>${finalName}</finalName>
