@@ -7,21 +7,21 @@ The job consumes data from a Kafka topic using Apache Flink for processing. A st
 a time window, transformed from a string containing a json array into a Flink tuple in order to be used in an aggregation function (average speed).
 The result is printed to the console. 
 
-##Documentation 
+## Documentation 
 This project is a component of the pilot that address the 4th H2020 Societal Challenge: Smart Green and Integrated Transport. 
 The pilot will provide a scalable and fault tolerant system to collect, process and store the data from sensors: GPS data from 
 cabs and data from Bluetooth sensors in the city of Thessaloniki, Greece.
 
-##Dependencies 
+## Dependencies 
 The job reads the data from a Kafka topic so Apache Kafka must be installed and run as explained in [Apache Kafka Quick Start](http://kafka.apache.org/documentation.html#quickstart).
 The data stream is fed by a consumer that fetches traffic data from the cabs in Thessaloniki, Greece. The software for the producer is available on Github in the [pilot-sc4-kafka-producer](https://github.com/big-data-europe/pilot-sc4-kafka-producer) repositoy. The job depends also on a Rserve server that receives R commands for a map matching algorithm. The project for the Rserve is [pilot-sc4-docker-r](https://github.com/big-data-europe/pilot-sc4-docker-r). Finally an instance of Elasticsearch must be started for the storage.   
 
-##Build 
+## Build 
 The software is based on Maven and can be build from the project root folder simply running the command
 
     mvn install
 
-##Install and Run 
+## Install and Run 
 The build creates a jar file with all the dependences and the configuration of the main class in the target folder. The job is configured to connect to a Kafka broker
 that manages the topic in the property file, the default port is 9090. To start the producer two arguments must be passed to the job. One argument is the Kafka topic i.e. the stream 
 from which the data is fetched. The other argument is the time interval in which the aggregation function must be applied. As an example run the following command
@@ -34,7 +34,7 @@ The job can also be started from the Flink JobManager, see the [Flink JobManager
     Entry Class: eu.bde.sc4pilot.flink.WindowTrafficData
     Program Arguments: --topic taxi --window 120
 
-##Usage 
+## Usage 
 The job saves the data into Elasticsearch, a document database for json data. The version supported by Apache Flink is [Elasticsearch 1.7.3](https://www.elastic.co/downloads/past-releases/elasticsearch-1-7-3). Install Elasticsearch and start it from the root folder
 
     $ ./bin/elasticsearch
@@ -55,6 +55,6 @@ Once Kibana is installed and start, an index pattern must be defined so that Kib
 to create the index. Please follow the instruction in [Getting started with Kibana](https://www.elastic.co/guide/en/kibana/current/getting-started.html) to learn how to create different types of visualizations such as vertical bar charts, pie charts, tile maps and more. 
  
 
-##License 
+## License 
 TBD
 
