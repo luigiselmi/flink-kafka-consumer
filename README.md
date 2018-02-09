@@ -3,18 +3,19 @@ Pilot SC4 Flink-Kafka-Consumer [![Build Status](https://travis-ci.org/big-data-e
 Flink consumer of a Kafka topic. 
 
 ## Description
-The job consumes data from a Kafka topic using Apache Flink for processing. A stream coming from a Kafka topic is read within
-a time window, transformed from a string containing a json array into a Flink tuple in order to be used in an aggregation function (average speed).
-The result is printed to the console. 
+The job consumes data from a Kafka topic using Apache Flink for processing. A stream coming from a Kafka topic is read
+ within a time window, transformed from a string containing a json array into a Flink tuple in order to be used in an
+ aggregation function (average speed). The result is printed to the console. 
 
 ## Documentation 
-This project is a component of the pilot that address the 4th H2020 Societal Challenge: Smart Green and Integrated Transport. 
-The pilot will provide a scalable and fault tolerant system to collect, process and store the data from sensors: GPS data from 
-cabs and data from Bluetooth sensors in the city of Thessaloniki, Greece.
+This project is a component of the pilot that addresses the 4th H2020 Societal Challenge: Smart Green and Integrated Transport. 
+The pilot will provide a scalable and fault tolerant system to collect, process and store the data from taxis equipped
+with GPS devices from the city of Thessaloniki, Greece.
 
 ## Dependencies 
 The job reads the data from a Kafka topic so Apache Kafka must be installed and run as explained in [Apache Kafka Quick Start](http://kafka.apache.org/documentation.html#quickstart).
-The data stream is fed by a consumer that fetches traffic data from the cabs in Thessaloniki, Greece. The software for the producer is available on Github in the [pilot-sc4-kafka-producer](https://github.com/big-data-europe/pilot-sc4-postgis) repositoy. The job depends also on a Rserve server that receives R commands for a map matching algorithm. The project for the Rserve is [pilot-sc4-docker-r](https://github.com/big-data-europe/pilot-sc4-docker-r). Finally an instance of Elasticsearch must be started for the storage.   
+The data stream is fed by a consumer that fetches traffic data from the cabs in Thessaloniki, Greece. The software for the producer is available on Github in the [pilot-sc4-kafka-producer](https://github.com/big-data-europe/pilot-sc4-kafka-producer) repositoy. 
+The job depends also on a Rserve server that receives R commands for a map matching algorithm. The project for the Rserve is [pilot-sc4-postgis](https://github.com/big-data-europe/pilot-sc4-postgis). Finally an instance of Elasticsearch must be started for the storage.   
 
 ## Build 
 The software is based on Maven and can be build from the project root folder simply running the command
