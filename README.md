@@ -20,14 +20,14 @@ The job depends also on a Rserve server that receives R commands for a map match
 ## Build 
 The software is based on Maven and can be build from the project root folder simply running the command
 
-    mvn install
+    $ mvn install
 
 ## Install and Run 
 The build creates a jar file with all the dependences and the configuration of the main class in the target folder. The job is configured to connect to a Kafka broker
 that manages the topic in the property file, the default port is 9090. To start the producer two arguments must be passed to the job. One argument is the Kafka topic i.e. the stream 
 from which the data is fetched. The other argument is the time interval in which the aggregation function must be applied. As an example run the following command
 
-    java -jar target/pilot-sc4-flink-kafka-consumer-0.0.1-SNAPSHOT-jar-with-dependencies.jar --topic taxi --window 120
+    $ java -jar target/pilot-sc4-flink-kafka-consumer-0.0.1-SNAPSHOT-jar-with-dependencies.jar --topic taxi --window 120
 
 The job will start to read the traffic data from the "taxi" topic, aggregate the speed of taxies every two minutes in road segments in which the taxies are localized, and print the result (average speed per road segment in the time window) to the console.
 The job can also be started from the Flink JobManager, see the [Flink JobManager Quick Star Setup](https://ci.apache.org/projects/flink/flink-docs-release-1.0/quickstart/setup_quickstart.html) to learn how to do it. Once Flink is started you can submit a job uploading the project jar file and setting the following parameters
