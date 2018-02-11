@@ -1,6 +1,7 @@
 package eu.bde.sc4pilot.flink;
 
 import java.io.InputStream;
+import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,7 +14,6 @@ import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.RuntimeContext;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple4;
-import org.apache.flink.api.java.tuple.Tuple7;
 import org.apache.flink.api.java.tuple.Tuple9;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.TimeCharacteristic;
@@ -23,10 +23,12 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
-import org.apache.flink.streaming.connectors.elasticsearch.ElasticsearchSink;
-import org.apache.flink.streaming.connectors.elasticsearch.IndexRequestBuilder;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer09;
+import org.apache.flink.streaming.connectors.elasticsearch2.ElasticsearchSink;
+import org.apache.flink.streaming.connectors.elasticsearch2.ElasticsearchSinkFunction;
+import org.apache.flink.streaming.connectors.elasticsearch2.RequestIndexer;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
 import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
+//import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.util.Collector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +41,6 @@ import eu.bde.sc4pilot.mapmatch.MapMatch;
 
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Requests;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.common.transport.TransportAddress;
 
 
 /**
@@ -87,33 +87,34 @@ public class WindowTrafficData {
     StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
     
     // set the time characteristic to include an event in a window (event time|ingestion time|processing time) 
-    env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime);
+    env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
     
-    FlinkKafkaConsumer09<String> consumer = 
-        new FlinkKafkaConsumer09<>(KAFKA_TOPIC_PARAM_VALUE, new SimpleStringSchema(), properties);
+    FlinkKafkaConsumer010<String> consumer = 
+        new FlinkKafkaConsumer010<>(KAFKA_TOPIC_PARAM_VALUE, new SimpleStringSchema(), properties);
     
     // gets the data from the kafka topic (json array) as a string
     DataStreamSource<String> stream = env
         .addSource(consumer);
     
     // map match locations given as (longitude, latitude) pairs to  streets
-    DataStream<Tuple9<Integer,String,Double,Double,Double,Integer,Double,Integer,String>> streamMatchedTuples = stream.flatMap(new MapMatcher());
+    //DataStream<Tuple9<Integer,String,Double,Double,Double,Integer,Double,Integer,String>> streamMatchedTuples = stream.flatMap(new MapMatcher());
     
     // define an aggregation function (such as average speed per road segment) to be applied within a specified window on a keyed stream
-    DataStream<Tuple4<String,Double,String,Integer>> averageSpeedStream = streamMatchedTuples
+    DataStream<Tuple4<String,Double,String,Integer>> averageSpeedStream = stream
+    	.flatMap(new MapMatcher())
         .keyBy(GpsJsonReader.OSM_LINK)
         .timeWindow(Time.seconds(TIME_WINDOW_PARAM_VALUE),Time.seconds(60))
         .apply(new AverageSpeed());
     
     // print the matched record with the link to a street 
-    streamMatchedTuples.print();
+    //streamMatchedTuples.print();
     
     // write the average speed in a time window to the console (or in a Kafka topic)
     // topic name, average speed in the road segment, road segment identifier, number of gps messages in the time window
     averageSpeedStream.print();
     
     // Save gps data into Elasticsearch
-    saveGpsData(streamMatchedTuples);
+    //saveGpsData(averageSpeedStream);
    
     
     env.execute("Thessaloniki Floating Cars Data");
@@ -127,12 +128,13 @@ public class WindowTrafficData {
 	config.put("bulk.flush.max.actions", "1");
 	config.put("cluster.name", "pilot-sc4");
 	
-	List<TransportAddress> transports = new ArrayList<TransportAddress>();
-	transports.add(new InetSocketTransportAddress("127.0.0.1", 9300));
+	List<InetSocketAddress> transports = new ArrayList<InetSocketAddress>();
+	transports.add(new InetSocketAddress("127.0.0.1", 9300));
 	//transports.add(new InetSocketTransportAddress("node-2", 9300));
 
-	inputStream.addSink(new ElasticsearchSink<Tuple9<Integer,String,Double,Double,Double,Integer,Double,Integer,String>>(config, transports, new IndexRequestBuilder<Tuple9<Integer,String,Double,Double,Double,Integer,Double,Integer,String>>() {
-		@Override
+	inputStream.addSink(new ElasticsearchSink<Tuple9<Integer,String,Double,Double,Double,Integer,Double,Integer,String>>(config, transports, 
+			new ElasticsearchSinkFunction<Tuple9<Integer,String,Double,Double,Double,Integer,Double,Integer,String>>() {
+		//@Override
 		public IndexRequest createIndexRequest(
 				Tuple9<Integer, String, Double, Double, Double, Integer, Double, Integer, String> gpsrecord,
 				RuntimeContext ctx) {
@@ -152,6 +154,16 @@ public class WindowTrafficData {
 	                .source(json);
 
 		}
+
+    @Override
+    public void process(Tuple9<Integer, String, Double, Double, Double, Integer, Double, Integer, String> arg0,
+        RuntimeContext arg1, RequestIndexer arg2) {
+      // TODO Auto-generated method stub
+      
+    }
+
+    
+		
 	}));
   }
 

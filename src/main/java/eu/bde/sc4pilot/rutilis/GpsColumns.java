@@ -9,16 +9,13 @@ import java.util.ArrayList;
 public class GpsColumns {
 
   public static String [] names = {
-      "device_id",
-      "inserted_timestamp",
-      "longitude", 
-      "latitude", 
+      "device_random_id",
+      "recorded_timestamp",
+      "lon", 
+      "lat", 
       "altitude",
       "speed", 
       "orientation", 
-      "recorded_timestamp", 
-      "valid", 
-      "zoneid", 
       "transfer", 
       "unix_timestamp"}; 
     

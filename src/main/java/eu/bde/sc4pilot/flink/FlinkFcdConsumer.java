@@ -7,7 +7,7 @@ import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer09;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,8 +58,8 @@ public class FlinkFcdConsumer {
     // set the time characteristic to include an event in a window (event time|ingestion time|processing time) 
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
     
-    FlinkKafkaConsumer09<FcdTaxiEvent> nrtFcdConsumer =
-               new FlinkKafkaConsumer09<FcdTaxiEvent>(KAFKA_TOPIC_PARAM_VALUE, new FcdTaxiSchema(), properties);
+    FlinkKafkaConsumer010<FcdTaxiEvent> nrtFcdConsumer =
+               new FlinkKafkaConsumer010<FcdTaxiEvent>(KAFKA_TOPIC_PARAM_VALUE, new FcdTaxiSchema(), properties);
     
     // gets the data from the kafka topic (avro binary data)
     DataStreamSource<FcdTaxiEvent> stream = env

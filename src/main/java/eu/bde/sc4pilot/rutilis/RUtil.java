@@ -16,10 +16,11 @@ import org.rosuda.REngine.RList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.bde.sc4pilot.flink.FcdTaxiEvent;
 import eu.bde.sc4pilot.json.GpsRecord;
 
 /**
- * Provides some methods to transform Java collections into R data frame
+ * Provides methods to transform Java collections into R data frame
  * @author Luigi Selmi
  *
  */
@@ -183,34 +184,32 @@ public class RUtil {
     return rlist;
   }
   /**
-   * Transforms an RList to an array of GpsRecord
+   * Transforms an RList of map-matched records to an array of GpsRecord
    * @param rlist
    * @return
    * @throws REXPMismatchException
    */
   public ArrayList<GpsRecord> createListFromRList(RList rlist) throws REXPMismatchException {
     ArrayList<GpsRecord> gpsrecords = new ArrayList<GpsRecord>();
-    int [] deviceId = rlist.at(GpsColumns.names[0]).asIntegers();
-    String [] insertedTimestamp = rlist.at(GpsColumns.names[1]).asStrings();       
-    double [] longitude = rlist.at(GpsColumns.names[2]).asDoubles();
-    double [] latitude = rlist.at(GpsColumns.names[3]).asDoubles();
-    double [] altitude = rlist.at(GpsColumns.names[4]).asDoubles();
-    int [] speed = rlist.at(GpsColumns.names[5]).asIntegers();
-    double [] orientation = rlist.at(GpsColumns.names[6]).asDoubles();
-    String [] recordedTimestamp = rlist.at(GpsColumns.names[7]).asStrings();
-    int [] valid = rlist.at(GpsColumns.names[8]).asIntegers();
-    int [] zoneid = rlist.at(GpsColumns.names[9]).asIntegers();
-    int [] transfer = rlist.at(GpsColumns.names[10]).asIntegers();
-    String [] unixTimestamp = rlist.at(GpsColumns.names[11]).asStrings();
-    String [] link = rlist.at(15).asStrings();
+    int [] deviceId = rlist.at("device_random_id").asIntegers();
+    String [] insertedTimestamp = rlist.at("recorded_timestamp").asStrings();       
+    String [] longitude = rlist.at("lon").asStrings();
+    String [] latitude = rlist.at("lat").asStrings();
+    String [] altitude = rlist.at("altitude").asStrings();
+    int [] speed = rlist.at("speed").asIntegers();
+    double [] orientation = rlist.at("orientation").asDoubles();
+    int [] transfer = rlist.at("transfer").asIntegers();
+    String [] link = rlist.at("osmids").asStrings();
     
-    for (int i = 0; i < rlist.size(); i++) {      
+    int size = deviceId.length;
+    
+    for (int i = 0; i < size; i++) {      
       GpsRecord gpsrecord = new GpsRecord();
       gpsrecord.setDeviceId(deviceId[i]);
       gpsrecord.setTimestamp(insertedTimestamp[i]);
-      gpsrecord.setLon(longitude[i]);
-      gpsrecord.setLat(latitude[i]);
-      gpsrecord.setAltitude(altitude[i]);
+      gpsrecord.setLon(Double.parseDouble(longitude[i]));
+      gpsrecord.setLat(Double.parseDouble(latitude[i]));
+      gpsrecord.setAltitude(Double.parseDouble(altitude[i]));
       gpsrecord.setSpeed(speed[i]);
       gpsrecord.setOrientation(orientation[i]);
       gpsrecord.setTransfer(transfer[i]);
@@ -219,5 +218,22 @@ public class RUtil {
     }
     
     return gpsrecords;
+  }
+  
+  /**
+   * Creates an R data frame from an object of type FcdTaxiEvent.
+   * @return
+   */
+  public RList createRListFromEvent(FcdTaxiEvent event) {
+	  RList rlist = new RList();
+	  rlist.put(GpsColumns.names[0],new REXPInteger(event.getDeviceId()));
+    rlist.put(GpsColumns.names[1],new REXPString(event.getTimestamp().toString()));
+    rlist.put(GpsColumns.names[2],new REXPDouble(event.getLon()));
+    rlist.put(GpsColumns.names[3],new REXPDouble(event.getLat()));
+    rlist.put(GpsColumns.names[4],new REXPDouble(event.getAltitude()));
+    rlist.put(GpsColumns.names[5],new REXPDouble(event.getSpeed()));
+    rlist.put(GpsColumns.names[6],new REXPDouble(event.getOrientation()));
+    rlist.put(GpsColumns.names[7],new REXPInteger(event.getTransfer()));
+	  return rlist;
   }
 }

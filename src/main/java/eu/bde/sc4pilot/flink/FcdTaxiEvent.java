@@ -3,7 +3,6 @@ package eu.bde.sc4pilot.flink;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.avro.LogicalTypes.Date;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
@@ -13,19 +12,16 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import com.google.common.io.Resources;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.twitter.bijection.Injection;
 import com.twitter.bijection.avro.GenericAvroCodecs;
 
 
 public class FcdTaxiEvent {
 	
-	private static transient DateTimeFormatter timeFormatter =
+  private static transient DateTimeFormatter timeFormatter =
 			DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS");
 	
-	public static final String FCD_THESSALONIKI_SCHEMA = "fcd-record-schema.avsc";
+  public static final String FCD_THESSALONIKI_SCHEMA = "fcd-record-schema.avsc";
   private static Schema schema = null; // avro schema used to send the messages in binary format to a Kafka topic
 	
 	public int deviceId = -1;
@@ -38,24 +34,92 @@ public class FcdTaxiEvent {
 	public int transfer = 0;
 	
 	public FcdTaxiEvent(int deviceId, 
-			            DateTime timestamp, 
-			            double lon, 
-			            double lat, 
-			            double altitude, 
-			            double speed, 
-			            double orientation, 
-			            int transfer) {
+            DateTime timestamp, 
+            double lon, 
+            double lat, 
+            double altitude, 
+            double speed, 
+            double orientation, 
+            int transfer) {
+				this.deviceId = deviceId;
+				this.timestamp = timestamp;
+				this.lon = lon;
+				this.lat = lat;
+				this.altitude = altitude;
+				this.speed = speed;
+				this.orientation = orientation;
+				this.transfer = transfer;
+		}
+
+	public FcdTaxiEvent() {}
+	
+	public int getDeviceId() {
+		return deviceId;
+	}
+
+	public void setDeviceId(int deviceId) {
 		this.deviceId = deviceId;
+	}
+
+	public DateTime getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(DateTime timestamp) {
 		this.timestamp = timestamp;
+	}
+
+	public double getLon() {
+		return lon;
+	}
+
+	public void setLon(double lon) {
 		this.lon = lon;
+	}
+
+	public double getLat() {
+		return lat;
+	}
+
+	public void setLat(double lat) {
 		this.lat = lat;
+	}
+
+	public double getAltitude() {
+		return altitude;
+	}
+
+	public void setAltitude(double altitude) {
 		this.altitude = altitude;
+	}
+
+	public double getSpeed() {
+		return speed;
+	}
+
+	public void setSpeed(double speed) {
 		this.speed = speed;
+	}
+
+	public double getOrientation() {
+		return orientation;
+	}
+
+	public void setOrientation(double orientation) {
 		this.orientation = orientation;
+	}
+
+	public int getTransfer() {
+		return transfer;
+	}
+
+	public void setTransfer(int transfer) {
 		this.transfer = transfer;
 	}
 
-	public FcdTaxiEvent() {}
+	
+	
+	
 	
 	/*
 	 * Creates one event from a json string
