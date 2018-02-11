@@ -38,17 +38,21 @@ The job can also be started from the Flink JobManager, see the [Flink JobManager
 ## Usage 
 The job saves the data into Elasticsearch, a document database for json data. The version supported by Apache Flink is [Elasticsearch 1.7.3](https://www.elastic.co/downloads/past-releases/elasticsearch-1-7-3). Install Elasticsearch and start it from the root folder
 
-    $ ./bin/elasticsearch
+    $ bin/elasticsearch -d -p pid
 
-Once Elasticsearch has started a schema,called mapping in Elasticsearch, must be created to inform Elasticsearch the data types used and to index the fields. Currently a mapping is available to store the Floating Cars Data. In  order to create the index, e.g. "thessaloniki", use the command 
+The commnad will start Elasticsearch in background and the process id in the pid file. Once Elasticsearch has started a schema,called mapping in Elasticsearch, must be created to inform Elasticsearch the data types used and to index the fields. Currently a mapping is available to store the Floating Cars Data. In  order to create the index, e.g. "thessaloniki", use the command 
 
-    curl -XPUT 'localhost:9200/thessaloniki'
+    $ curl -XPUT 'localhost:9200/thessaloniki'
 
 and then send the schema using the command
 
-    curl -XPUT "http://localhost:9200/thessaloniki/_mapping/floating-cars" -d @elasticsearch_fcd_mapping.json
+    $ curl -XPUT "http://localhost:9200/thessaloniki/_mapping/floating-cars" -d @elasticsearch_fcd_mapping.json
     
-Elasticsearch is now ready to store and index the json data. Before starting the consumer check the value of the property 'cluster.name' in the Elasticsearch configuration file 'elasticsearch.yml'. 
+Elasticsearch is now ready to store and index the json data. You can check the index that has been creted sending the following request using the browser or curl
+
+    $ curl http://localhost:9200/thessaloniki
+    
+Before starting the consumer check the value of the property 'cluster.name' in the Elasticsearch configuration file 'elasticsearch.yml'. 
 The same key-value pair, e.g cluster.name: pilot-sc4, must be used in the consumer's configuration paramaters. 
 
 The data stored in Elasticsearch can be easily visualized using Kibana. The version supported by Elasticsearch 1.7.3 is [Kibana 4.1.3](https://www.elastic.co/downloads/past-releases/kibana-4-1-3). 
