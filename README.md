@@ -35,8 +35,8 @@ The job can also be started from the Flink JobManager, see the [Flink JobManager
     Entry Class: eu.bde.sc4pilot.flink.WindowTrafficData
     Program Arguments: --topic taxi --window 120
 
-## Usage 
-The job saves the data into Elasticsearch, a document database for json data. The version supported by Apache Flink is [Elasticsearch 1.7.3](https://www.elastic.co/downloads/past-releases/elasticsearch-1-7-3). Install Elasticsearch and start it from the root folder
+## Elasticsearch 
+The job saves the data into Elasticsearch, a document database for json data. The version supported by Apache Flink 1.2.1 is [Elasticsearch 2.4.6](https://www.elastic.co/downloads/past-releases/elasticsearch-2-4-6). Install Elasticsearch and start it from the root folder
 
     $ bin/elasticsearch -d -p pid
 
@@ -55,9 +55,10 @@ Elasticsearch is now ready to store and index the json data. You can check the i
 Before starting the consumer check the value of the property 'cluster.name' in the Elasticsearch configuration file 'elasticsearch.yml'. 
 The same key-value pair, e.g cluster.name: pilot-sc4, must be used in the consumer's configuration paramaters. 
 
-The data stored in Elasticsearch can be easily visualized using Kibana. The version supported by Elasticsearch 1.7.3 is [Kibana 4.1.3](https://www.elastic.co/downloads/past-releases/kibana-4-1-3). 
+## Kibana
+The data stored in Elasticsearch can be easily visualized using Kibana. The version supported by Elasticsearch 2.4.6 is [Kibana 4.6.6](https://www.elastic.co/downloads/past-releases/kibana-4-6-6). 
 Once Kibana is installed and start, an index pattern must be defined so that Kibana can find and retrieve the data from Elasticsearch. The index pattern must match with the index name used. In our example the index name is "thessaloniki" as in the path used
-to create the index. Please follow the instruction in [Getting started with Kibana](https://www.elastic.co/guide/en/kibana/current/getting-started.html) to learn how to create different types of visualizations such as vertical bar charts, pie charts, tile maps and more. 
+to create the index. Please follow the instruction in [Getting started with Kibana](https://www.elastic.co/guide/en/kibana/current/getting-started.html) to learn how to create different types of visualizations such as vertical bar charts, pie charts, tile maps and more. Check the format of the date used by Kibana and change in case it is different from the one used in your data. 
  
 
 ## License 
