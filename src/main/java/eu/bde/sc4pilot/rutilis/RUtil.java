@@ -213,7 +213,7 @@ public class RUtil {
       gpsrecord.setSpeed(speed[i]);
       gpsrecord.setOrientation(orientation[i]);
       gpsrecord.setTransfer(transfer[i]);
-      gpsrecord.setLink(link[i]);
+      gpsrecord.setLink(link[i].replaceAll("[^0-9.]","")); // remove {}
       gpsrecords.add(gpsrecord);
     }
     
