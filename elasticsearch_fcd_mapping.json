@@ -1,16 +1,13 @@
 {
   "floating-cars" : {
     "properties" : {
-       "id" : {"type": "integer"},
+       "roadsegmentid" : {"type": "string"},
        "timestamp" : {"type": "date",
-                      "format": "YYYY-MM-DD HH:mm:ss.SSS"},
+                      "format": "YYYY-MM-DD HH:mm:ss"
+                     },
        "location" : {"type": "geo_point"},
-       "altitude" : {"type": "double"},
-       "speed" : {"type": "integer"},
-       "orientation" : {"type": "double"},
-       "transfer" : {"type": "integer"},
-       "roadsegment" : {"type": "string",
-                        "index": "not_analyzed"}
-    }
-  }
+       "speed" : {"type": "double"},
+       "count" : {"type": "integer"}
+   }
+ }
 }
