@@ -38,6 +38,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.common.io.Resources;
@@ -259,12 +260,10 @@ public class FlinkFcdConsumerElasticsearch {
       meanLongitude = meanLongitude / count;
       meanLatitude = meanLatitude / count;
       
-      //DateTime athensTime = new DateTime(window.getEnd(), DateTimeZone.forID("Europe/Athens"));
-      DateTimeFormatter timeFormatter =DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
-      //String timestamp = athensTime.toString(timeFormatter);
+      DateTimeFormatter timeFormatter =ISODateTimeFormat.dateHourMinuteSecond();
       String timestamp = timeFormatter.print(window.getEnd());
       out.collect(new Tuple6<>(roadSegmentId,meanLongitude, meanLatitude, averageSpeed, count, timestamp));
-      //System.out.println(roadSegmentId + ", " + meanLongitude + ", " + meanLatitude + ", " + averageSpeed + ", " + count + ", " + timestamp);
+      System.out.println(roadSegmentId + ", " + meanLongitude + ", " + meanLatitude + ", " + averageSpeed + ", " + count + ", " + timestamp);
     }
     
   }

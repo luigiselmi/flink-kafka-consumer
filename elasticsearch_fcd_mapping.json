@@ -3,7 +3,7 @@
     "properties" : {
        "roadsegmentid" : {"type": "string"},
        "timestamp" : {"type": "date",
-                      "format": "YYYY-MM-DD HH:mm:ss"
+                      "format": "yyyy-MM-ddTHH:mm:ss"
                      },
        "location" : {"type": "geo_point"},
        "speed" : {"type": "double"},
