@@ -1,14 +1,17 @@
-# Docker file for the FCD Flink application. The application is part of the BDE SC4 Pilot.
+# Docker file for the FCD traffic Monitoring. The application is part of the BDE SC4 Pilot.
 # It connects to a Kafka topic, sends the data to an R server to map match the coordinates
 # of vehicles to the road segments and then aggregates the vehicles speed to calculate the 
 # average speed in each road segment. Finally the data is sent to Elasticsearch (Flink sink). 
 # 1) Build an image using this docker file. Run the following docker command
-# docker build -t bde2020/pilot-sc4-flink-kafka-consumer:v0.0.1 .
+# 
+#    $ docker build -t bde2020/pilot-sc4-monitoring:v0.1.0 .
+#
 # 2) Run a container and submit the application to the Flink Job Manager.
-# docker run --rm --name fcd-flink-app --link flink-master:flink-master -it bde2020/pilot-sc4-flink-kafka-consumer:v0.0.1 /bin/bash
+#
+# docker run --rm --name fcd-flink-app --link flink-master:flink-master -it bde2020/pilot-sc4-monitoring:v0.1.0 /bin/bash
 
 # Pull the base image
-FROM bde2020/flink-maven-template:0.10.1-hadoop2.7
+FROM bde2020/flink-maven-template:1.4.0-hadoop2.7
 
 MAINTAINER Luigi Selmi <luigiselmi@gmail.com>
 
