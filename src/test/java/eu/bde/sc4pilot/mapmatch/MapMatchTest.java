@@ -43,9 +43,9 @@ public class MapMatchTest {
     event.setOrientation(253.89999399999999);
     event.setTransfer(-1);
     MapMatch matcher = new MapMatch();
-    ArrayList<GpsRecord> matches = matcher.mapMatch(event, "localhost", 6311);
+    ArrayList<GpsRecord> matches = matcher.mapMatch(event, "172.18.0.2", 6311);
     GpsRecord match = matches.get(0);
-    assertTrue("{132270824}".equals(match.getLink()));
+    assertTrue("132270824".equals(match.getLink()));
     */
   }
   

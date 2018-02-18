@@ -15,7 +15,7 @@ public class RUtilTest {
   public void setUp() throws Exception {
   }
   /**
-   * This test can be used to whether the connection to Rserve works.
+   * This test can be used to see whether the connection to Rserve works.
    * The code is commented so the build can be performed when Rserve is not available.
    * @throws RserveException
    * @throws REXPMismatchException
@@ -25,14 +25,15 @@ public class RUtilTest {
     /*
     RConnection c = getConnection();
     REXP x = c.eval("R.version.string");
-    assertTrue("R version 3.1.1 (2014-07-10)".equals(x.asString()));
+    String message = x.asString();
+    assertTrue("R version 3.2.3 (2015-12-10)".equals(message));
     */
   }
   
   private RConnection getConnection() {
     RConnection c = null;
     try {
-      c = new RConnection("localhost", 6311);
+      c = new RConnection("172.18.0.3", 6311);
       
       
     } catch (RserveException e) {     
