@@ -102,7 +102,7 @@ services:
               - flink-master
 
     consumer:
-       image: bde2020/pilot-sc4-consumer
+       image: bde2020/pilot-sc4-monitoring:v0.1.0
        hostname: consumer
        container_name: sc4-consumer
        environment:
