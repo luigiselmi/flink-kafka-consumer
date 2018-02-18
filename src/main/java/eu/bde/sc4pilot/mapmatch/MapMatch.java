@@ -59,8 +59,7 @@ public class MapMatch {
       c.assign("gpsdata", REXP.createDataFrame(l));
       //c.voidEval("initgps<-initGpsData(gpsdata)");
       //c.voidEval("gdata<-readGpsData(gpsdata)");
-      //RList matches = c.eval("match(road,initgps,gdata)").asList();
-      RList matches = c.eval("match(gdata,'localhost',5432,'thessaloniki','postgres','$POSTGREES_PASSWORD')").asList();
+      RList matches = c.eval("match(gdata,'postgis',5432,'thessaloniki','postgres','$POSTGREES_PASSWORD')").asList();
       matchedRecords = util.createListFromRList(matches);
       
     } catch (RserveException e) {   
@@ -115,7 +114,7 @@ public class MapMatch {
       //c.voidEval("gdata<-read.table(gpsdata)");
       //c.voidEval("gdata<-data.frame(gpsdata)");
       //RList matches = c.eval("match(road,initgps,gdata)").asList();
-      RList matches = c.eval("match(gpsdata,'localhost',5432,'thessaloniki','postgres','password')").asList();
+      RList matches = c.eval("match(gpsdata,'postgis',5432,'thessaloniki','postgres','password')").asList();
       if(matches != null && ! matches.isEmpty()) {
         matchedRecords = util.createListFromRList(matches);
       }
