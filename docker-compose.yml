@@ -1,0 +1,124 @@
+version: '3.2'
+
+services:
+    zookeeper:
+        image: bde2020/pilot-sc4-zookeeper:v0.1.0
+        hostname: zookeeper
+        container_name: sc4-zookeeper
+        environment:
+            - MYID=1
+        expose:
+            - "2181"
+        ports:
+            - "2181:2181"
+        networks:
+          - pilot-sc4-net
+    
+    kafka:
+        image: bde2020/pilot-sc4-kafka:v0.1.0
+        hostname: kafka
+        container_name: sc4-kafka
+        environment:
+            - SERVICE_PRECONDITION=zookeeper:2181
+            - ZOOKEEPER_SERVERS=zookeeper:2181
+            - INITIAL_TOPICS="taxi" 
+        depends_on:
+            - zookeeper
+        expose:
+            - "9092"
+        networks:
+          - pilot-sc4-net
+
+    fcd-producer:
+        image: bde2020/pilot-sc4-fcd-producer:v0.1.0
+        container_name: fcd-producer
+        environment:
+          - ZOOKEEPER_SERVERS=zookeeper:2181
+        depends_on:
+            - kafka
+        networks:
+          - pilot-sc4-net
+
+    postgis-service:
+      image: bde2020/pilot-sc4-postgis:v0.1.0
+      container_name: postgres
+      restart: unless-stopped
+      ports:
+        - "5432:5432"
+      environment:
+        - POSTGRES_PASSWORD="password"
+      networks:
+        - pilot-sc4-net
+
+    map-match-service:
+      image: bde2020/pilot-sc4-rserve:v0.1.0
+      container_name: map-match
+      restart: unless-stopped
+      ports:
+        - "6311:6311"
+      environment:
+        - POSTGRES_PASSWORD="password"
+      depends_on:
+        - postgis-service
+      networks:
+        - pilot-sc4-net
+
+     
+    flink-master:
+        image: bde2020/flink-master:1.4.0-hadoop2.7
+        hostname: flink-master
+        container_name: sc4-flink-master
+        expose:
+            - "8081"
+            - "8080"
+        environment:
+            SERVICE_PRECONDITION: "namenode:50070 datanode:50075 resourcemanager:8088"
+            CSS_SOURCE: "flink-dashboard"
+            ENABLE_INIT_DAEMON: "false"
+            INIT_DAEMON_STEP: "setup_flink"
+            VIRTUAL_HOST: flink-master.big-data-europe.local
+            VIRTUAL_PORT: "8081"
+#       volumes:
+#             - ./data/flink-master:/data
+        env_file:
+              - ./config/hadoop/hadoop.env
+        depends_on:
+              - namenode
+              - datanode
+
+    flink-worker:
+        image: bde2020/flink-worker:1.4.0-hadoop2.7
+        hostname: flink-worker
+        container_name: sc4-flink-worker
+        environment:
+            SERVICE_PRECONDITION: "flink-master:8081"
+            FLINK_MASTER_PORT_6123_TCP_ADDR: "flink-master"
+            FLINK_NUM_TASK_SLOTS: "2"
+            CSS_SOURCE: "flink-dashboard"
+            ENABLE_INIT_DAEMON: "false"
+            VIRTUAL_HOST: flink-worker.big-data-europe.local
+            VIRTUAL_PORT: "8080"
+        depends_on:
+              - flink-master
+
+    consumer:
+       image: bde2020/pilot-sc4-consumer
+       hostname: consumer
+       container_name: sc4-consumer
+       environment:
+            SERVICE_PRECONDITION: "kafka:9092 elasticsearch:9200"
+            FLINK_MASTER: "flink-master"
+            REQUEST_SLOTS: 1
+            HDFS_URL: hdfs://namenode:8020
+            ENABLE_INIT_DAEMON: "false"
+            INIT_DAEMON_STEP: floating_consumer
+            FLINK_MASTER_PORT_6123_TCP_ADDR: "flink-master"
+            FLINK_MASTER_PORT_6123_TCP_PORT: "6123"
+            INIT_DAEMON_BASE_URI: "http://backend/init-daemon"
+        env_file:
+            - ./config/hadoop/hadoop.env
+
+
+networks:
+    pilot-sc4-net:
+      external: true
