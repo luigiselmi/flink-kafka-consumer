@@ -41,7 +41,7 @@ services:
 
     postgis-service:
       image: bde2020/pilot-sc4-postgis:v0.1.0
-      container_name: postgres
+      container_name: postgis
       restart: unless-stopped
       ports:
         - "5432:5432"
@@ -52,7 +52,7 @@ services:
 
     map-match-service:
       image: bde2020/pilot-sc4-rserve:v0.1.0
-      container_name: map-match
+      container_name: rserve
       restart: unless-stopped
       ports:
         - "6311:6311"
