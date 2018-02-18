@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>sc4pilot</groupId>
   <artifactId>pilot-sc4-flink-kafka-consumer</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.1.0-SNAPSHOT</version>
   <name>Big Data Europe - Pilot SC4 Flink Kakfa Consumer</name>
   <description>A Kafka consumer to process stream data with Flink</description>
     <properties>
