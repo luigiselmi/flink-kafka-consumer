@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -15,8 +14,6 @@ import java.util.Properties;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.RuntimeContext;
 import org.apache.flink.api.java.tuple.Tuple;
-import org.apache.flink.api.java.tuple.Tuple4;
-import org.apache.flink.api.java.tuple.Tuple5;
 import org.apache.flink.api.java.tuple.Tuple6;
 import org.apache.flink.api.java.tuple.Tuple9;
 import org.apache.flink.api.java.utils.ParameterTool;
@@ -34,9 +31,6 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
 import org.apache.flink.util.Collector;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Requests;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
@@ -46,8 +40,6 @@ import com.google.common.io.Resources;
 import eu.bde.sc4pilot.json.GpsJsonReader;
 import eu.bde.sc4pilot.json.GpsRecord;
 import eu.bde.sc4pilot.mapmatch.MapMatch;
-
-
 
 /**
  * This class provides the execution plan of a Flink job. It reads the records
@@ -69,8 +61,6 @@ public class FlinkFcdConsumerElasticsearch {
   private static String KAFKA_TOPIC_PARAM_NAME = "topic";
   private static String KAFKA_TOPIC_PARAM_VALUE = null;
   private static String TIME_WINDOW_PARAM_NAME = "window";
-  private static String HDFS_SINK_PARAM_NAME = "sink";
-  private static String HDFS_SINK_PARAM_VALUE = null;
   private static int TIME_WINDOW_PARAM_VALUE = 0;
   private static final int MAX_EVENT_DELAY = 60; // events are at most 60 sec out-of-order.
   private static final Logger log = LoggerFactory.getLogger(FlinkFcdConsumerElasticsearch.class);
@@ -87,7 +77,6 @@ public class FlinkFcdConsumerElasticsearch {
     
     KAFKA_TOPIC_PARAM_VALUE = parameter.get(KAFKA_TOPIC_PARAM_NAME);
     TIME_WINDOW_PARAM_VALUE = parameter.getInt(TIME_WINDOW_PARAM_NAME, TIME_WINDOW_PARAM_VALUE);
-    HDFS_SINK_PARAM_VALUE = parameter.get(HDFS_SINK_PARAM_NAME);
     
     Properties properties = null;
     
@@ -125,17 +114,7 @@ public class FlinkFcdConsumerElasticsearch {
 			  .apply(new RoadSegment());
 			  
 	
-	  // Counts the events that happen in any cell within the bounding box
-	  /*
-	  DataStream<Tuple5<Integer, Double, Double, Integer, String>> boxBoundedEvents = events
-			// match each event within the bounding box to grid cell
-			.map(new GridCellMatcher())
-			// partition by cell
-			.keyBy(0)
-			// build time window
-			.timeWindow(Time.minutes(TIME_WINDOW_PARAM_VALUE))
-			.apply(new EventCounter());
-	*/
+	  
 	  // stores the data in Elasticsearch
 	  saveFcdDataElasticsearch(streamMatchedTuples);
 	  
@@ -146,44 +125,7 @@ public class FlinkFcdConsumerElasticsearch {
   
   }
   
-  /**
-   * Counts the number of events..
-   */
-  /*
-  public static class EventCounter implements WindowFunction<
-	  Tuple2<Integer, Boolean>,       // input type (cell id, is within bb)
-	  Tuple5<Integer, Double, Double, Integer, String>, // output type (cell id, counts, window time)
-	  Tuple,                          // key type
-	  TimeWindow>                     // window type
-	{
-    private static transient DateTimeFormatter timeFormatter =
-        DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
-    
-	  @SuppressWarnings("unchecked")
-	  @Override
-	  public void apply(
-		  Tuple key,
-		  TimeWindow window,
-		  Iterable<Tuple2<Integer, Boolean>> gridCells,
-		  Collector<Tuple5<Integer, Double, Double, Integer, String>> out) throws Exception {
-
-		  int cellId = ((Tuple1<Integer>)key).f0;
-		  double cellLat = GeoUtils.getCellLatitude(cellId);
-		  double cellLon = GeoUtils.getCellLongitude(cellId);
-		  String windowTime = timeFormatter.print(window.getEnd());
-		
-		  // counts all the records (number of vehicles) from the same cell 
-		  // within the bounding box or outside (cell id = 0)
-		  int cnt = 0;
-		  for(Tuple2<Integer, Boolean> c : gridCells) {
-			  cnt += 1;
-		  }
-
-		  out.collect(new Tuple5<>(cellId, cellLat, cellLon, cnt, windowTime));
-	  }
-  }
- */
-  /**
+   /**
    * Match locations to streets
    */
   public static class MapMatcher implements FlatMapFunction<FcdTaxiEvent, Tuple9<Integer,String,Double,Double,Double,Integer,Double,Integer,String> > {
@@ -196,7 +138,7 @@ public class FlinkFcdConsumerElasticsearch {
         
         MapMatch matcher = new MapMatch();
         // map match the locations
-        ArrayList<GpsRecord> matchedRecs = matcher.mapMatch(event, "localhost", 6311);
+        ArrayList<GpsRecord> matchedRecs = matcher.mapMatch(event, "rserve", 6311);
         if(matchedRecs != null && ! matchedRecs.isEmpty()) {
          Iterator<GpsRecord> imatchedRecs = matchedRecs.iterator();
          while (imatchedRecs.hasNext()) {
@@ -219,7 +161,7 @@ public class FlinkFcdConsumerElasticsearch {
   }
   
   /**
-   * Aggregation function to calculate the average speed within a time window.
+   * Aggregation function to compute the number of vehicles and the average speed within a time window.
    * It returns 
    * 1) the topic name
    * 2) the average speed in a road segment within the time window set
@@ -299,7 +241,7 @@ public class FlinkFcdConsumerElasticsearch {
 
 		List<InetSocketAddress> transports = new ArrayList<InetSocketAddress>();
 		log.info("XXXXX (InetAddress.getByName(elasticsearch), 9300))");
-		transports.add(new InetSocketAddress(InetAddress.getByName("localhost"), 9300));
+		transports.add(new InetSocketAddress(InetAddress.getByName("elasticsearch"), 9300));
 
 		inputStream.addSink(new ElasticsearchSink<>(config, transports, new RoadSegmentInserter()));
     
@@ -318,7 +260,7 @@ public class FlinkFcdConsumerElasticsearch {
         json.put("count", record.f4);
         json.put("timestamp", record.f5);
 
-        IndexRequest rqst = Requests.indexRequest().index("thessaloniki").type("floating-cars").source(json);
+        IndexRequest rqst = Requests.indexRequest().index("thessaloniki-monitoring").type("floating-cars").source(json);
       
         indexer.add(rqst);
 
