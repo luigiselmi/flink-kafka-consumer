@@ -1,6 +1,8 @@
 version: '3.2'
 
 services:
+
+# ---------------- Kakfa & Zookeeper --------------
     zookeeper:
         image: bde2020/pilot-sc4-zookeeper:v0.1.0
         hostname: zookeeper
@@ -29,41 +31,7 @@ services:
         networks:
           - pilot-sc4-net
 
-    fcd-producer:
-        image: bde2020/pilot-sc4-fcd-producer:v0.1.0
-        container_name: fcd-producer
-        environment:
-          - ZOOKEEPER_SERVERS=zookeeper:2181
-        depends_on:
-            - kafka
-        networks:
-          - pilot-sc4-net
-
-    postgis-service:
-      image: bde2020/pilot-sc4-postgis:v0.1.0
-      container_name: postgis
-      restart: unless-stopped
-      ports:
-        - "5432:5432"
-      environment:
-        - POSTGRES_PASSWORD="password"
-      networks:
-        - pilot-sc4-net
-
-    map-match-service:
-      image: bde2020/pilot-sc4-rserve:v0.1.0
-      container_name: rserve
-      restart: unless-stopped
-      ports:
-        - "6311:6311"
-      environment:
-        - POSTGRES_PASSWORD="password"
-      depends_on:
-        - postgis-service
-      networks:
-        - pilot-sc4-net
-
-     
+# -------------------- Flink -----------------------------    
     flink-master:
         image: bde2020/flink-master:1.4.0-hadoop2.7
         hostname: flink-master
@@ -72,7 +40,7 @@ services:
             - "8081"
             - "8080"
         environment:
-            SERVICE_PRECONDITION: "namenode:50070 datanode:50075 resourcemanager:8088"
+#            SERVICE_PRECONDITION: "namenode:50070 datanode:50075 resourcemanager:8088"
             CSS_SOURCE: "flink-dashboard"
             ENABLE_INIT_DAEMON: "false"
             INIT_DAEMON_STEP: "setup_flink"
@@ -80,11 +48,8 @@ services:
             VIRTUAL_PORT: "8081"
 #       volumes:
 #             - ./data/flink-master:/data
-        env_file:
-              - ./config/hadoop/hadoop.env
-        depends_on:
-              - namenode
-              - datanode
+        networks:
+          - pilot-sc4-net
 
     flink-worker:
         image: bde2020/flink-worker:1.4.0-hadoop2.7
@@ -100,24 +65,128 @@ services:
             VIRTUAL_PORT: "8080"
         depends_on:
               - flink-master
+	networks:
+          - pilot-sc4-net
 
-    consumer:
-       image: bde2020/pilot-sc4-monitoring:v0.1.0
-       hostname: consumer
-       container_name: sc4-consumer
-       environment:
+    fcd-producer:
+        image: bde2020/pilot-sc4-fcd-producer:v0.1.0
+        hostname: fcd-producer
+        container_name: fcd-producer
+        restart: unless-stopped
+        environment:
+          - ZOOKEEPER_SERVERS=zookeeper:2181
+        depends_on:
+            - kafka
+        networks:
+          - pilot-sc4-net
+
+    fcd-consumer:
+        image: bde2020/pilot-sc4-monitoring:v0.1.0
+        hostname: consumer
+        container_name: sc4-consumer
+        environment:
             SERVICE_PRECONDITION: "kafka:9092 elasticsearch:9200"
             FLINK_MASTER: "flink-master"
             REQUEST_SLOTS: 1
-            HDFS_URL: hdfs://namenode:8020
             ENABLE_INIT_DAEMON: "false"
             INIT_DAEMON_STEP: floating_consumer
             FLINK_MASTER_PORT_6123_TCP_ADDR: "flink-master"
             FLINK_MASTER_PORT_6123_TCP_PORT: "6123"
             INIT_DAEMON_BASE_URI: "http://backend/init-daemon"
-        env_file:
-            - ./config/hadoop/hadoop.env
+        networks:
+          - pilot-sc4-net
 
+    postgis:
+        image: bde2020/pilot-sc4-postgis:v0.1.0
+        hostname: postgis
+        container_name: postgis
+        restart: unless-stopped
+        ports:
+           - "5432:5432"
+        environment:
+          - POSTGRES_PASSWORD="password"
+        networks:
+          - pilot-sc4-net
+
+    rserve:
+       image: bde2020/pilot-sc4-rserve:v0.1.0
+       hostname: rserve
+       container_name: rserve
+       restart: unless-stopped
+       ports:
+         - "6311:6311"
+       environment:
+         - POSTGRES_PASSWORD="password"
+       depends_on:
+         - postgis-service
+       networks:
+         - pilot-sc4-net
+
+#-----------------------------------------------------------------------------
+    elasticsearch:
+        image: bde2020/sc4-elasticsearch
+        hostname: elasticsearch
+        container_name: sc4-elasticsearch
+        build:
+            context: sc4-elasticsearch/
+        environment:
+            VIRTUAL_HOST: elasticsearch.big-data-europe.local
+            VIRTUAL_PORT: "9200"
+        ports:
+            - 9200:9200
+            - 9300:9300
+        networks:
+          - pilot-sc4-net
+
+    kibana:
+        image: kibana:4.6.6
+        hostname: kibana
+        container_name: sc4-kibana
+        environment:
+            ELASTICSEARCH_URL: http://elasticsearch:9200
+            VIRTUAL_HOST: kibana.big-data-europe.local
+            VIRTUAL_PORT: "5601"
+        ports:
+            - 5601:5601
+        networks:
+          - pilot-sc4-net
+
+    integratorui:
+        build:
+            context: .
+            dockerfile: sc4-integratorui.dockerfile
+        image: bde2020/pilot-sc4-integratorui
+        hostname: integratorui
+        container_name: sc4-integratorui
+        environment:
+            VIRTUAL_HOST: demo.big-data-europe.local
+# config/integrator/ with file user-interfaces is copied into the image, see sc4-integratorui.dockerfile
+# for development bind this volume into the container
+#       volumes:
+#           - ./config/integrator:/app/config
+        networks:
+          - pilot-sc4-net
+
+    csswrapper:
+        image: bde2020/pilot-sc4-csswrapper
+        hostname: csswrapper
+        container_name: sc4-csswrapper
+        build:
+            context: .
+            dockerfile: sc4-csswrapper.dockerfile
+        ports:
+            - 80:80
+        volumes:
+            - /var/run/docker.sock:/tmp/docker.sock:ro
+# config/nginx.conf copied into the image, see sc4-csswrapper.dockerfile
+# for development bind this volume into the container
+#           - config/nginx.conf:/etc/nginx/nginx.conf
+        networks:
+          - pilot-sc4-net
+
+#networks:
+#    default:
+#        driver: overlay
 
 networks:
     pilot-sc4-net:
