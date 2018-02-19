@@ -4,7 +4,7 @@ services:
 
 # ---------------- Kakfa & Zookeeper --------------
     zookeeper:
-        image: bde2020/pilot-sc4-zookeeper:v0.1.0
+        image: bde2020/pilot-sc4-zookeeper
         hostname: zookeeper
         container_name: sc4-zookeeper
         environment:
@@ -17,7 +17,7 @@ services:
           - pilot-sc4-net
     
     kafka:
-        image: bde2020/pilot-sc4-kafka:v0.1.0
+        image: bde2020/pilot-sc4-kafka
         hostname: kafka
         container_name: sc4-kafka
         environment:
@@ -65,7 +65,7 @@ services:
             VIRTUAL_PORT: "8080"
         depends_on:
               - flink-master
-	networks:
+        networks:
           - pilot-sc4-net
 
     fcd-producer:
@@ -118,7 +118,7 @@ services:
        environment:
          - POSTGRES_PASSWORD="password"
        depends_on:
-         - postgis-service
+         - postgis
        networks:
          - pilot-sc4-net
 
@@ -127,8 +127,8 @@ services:
         image: bde2020/sc4-elasticsearch
         hostname: elasticsearch
         container_name: sc4-elasticsearch
-        build:
-            context: sc4-elasticsearch/
+#        build:
+#            context: sc4-elasticsearch/
         environment:
             VIRTUAL_HOST: elasticsearch.big-data-europe.local
             VIRTUAL_PORT: "9200"
