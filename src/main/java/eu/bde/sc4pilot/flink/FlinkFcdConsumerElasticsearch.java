@@ -260,7 +260,7 @@ public class FlinkFcdConsumerElasticsearch {
         json.put("count", record.f4);
         json.put("timestamp", record.f5);
 
-        IndexRequest rqst = Requests.indexRequest().index("thessaloniki-monitoring").type("floating-cars").source(json);
+        IndexRequest rqst = Requests.indexRequest().index("thessaloniki").type("floating-cars").source(json);
       
         indexer.add(rqst);
 

@@ -3,7 +3,7 @@
   <groupId>sc4pilot</groupId>
   <artifactId>pilot-sc4-monitoring</artifactId>
   <version>0.1.0-SNAPSHOT</version>
-  <name>Big Data Europe - Pilot SC4 Flink Kakfa Consumer</name>
+  <name>Big Data Europe - Pilot SC4 Traffic Monitoring</name>
   <description>A Kafka consumer to process stream data with Flink</description>
     <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
