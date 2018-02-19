@@ -21,5 +21,5 @@ RUN apt-get update && \
     apt-get install -y iputils-ping && \
     apt-get install -y iproute2
 
-ENV FLINK_APPLICATION_JAR_NAME pilot-sc4-flink-kafka-consumer-0.0.1-SNAPSHOT-jar-with-dependencies.jar
-ENV FLINK_APPLICATION_ARGS "--topic taxi --window 120"
+ENV FLINK_APPLICATION_JAR_NAME pilot-sc4-monitoring-0.10.0-SNAPSHOT-jar-with-dependencies.jar
+ENV FLINK_APPLICATION_ARGS "--topic taxi --window 5"
