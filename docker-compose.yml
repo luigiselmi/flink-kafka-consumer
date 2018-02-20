@@ -5,6 +5,8 @@ services:
 # ---------------- Kakfa & Zookeeper --------------
     zookeeper:
         image: bde2020/pilot-sc4-zookeeper
+        build:
+            context: ./sc4-zookeeper
         hostname: zookeeper
         container_name: sc4-zookeeper
         environment:
@@ -18,6 +20,8 @@ services:
     
     kafka:
         image: bde2020/pilot-sc4-kafka
+        build:
+            context: ./sc4-kafka
         hostname: kafka
         container_name: sc4-kafka
         environment:
@@ -130,7 +134,7 @@ services:
         hostname: elasticsearch
         container_name: elasticsearch
         build:
-            context: sc4-elasticsearch/
+            context: ./sc4-elasticsearch
         environment:
             VIRTUAL_HOST: elasticsearch.big-data-europe.local
             VIRTUAL_PORT: "9200"
@@ -172,11 +176,11 @@ services:
 
     csswrapper:
         image: bde2020/pilot-sc4-csswrapper
-        hostname: csswrapper
-        container_name: sc4-csswrapper
         build:
             context: .
             dockerfile: sc4-csswrapper.dockerfile
+        hostname: csswrapper
+        container_name: sc4-csswrapper
         ports:
             - 80:80
         volumes:
