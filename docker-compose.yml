@@ -81,8 +81,8 @@ services:
           - pilot-sc4-net
 
     fcd-consumer:
-        image: bde2020/pilot-sc4-monitoring:v0.10.0
-        hostname: fcd-consumer
+        image: bde2020/pilot-sc4-monitoring:v0.10.1
+        hostname: consumer
         container_name: fcd-consumer
         environment:
             SERVICE_PRECONDITION: "kafka:9092 elasticsearch:9200"
@@ -93,8 +93,6 @@ services:
             FLINK_MASTER_PORT_6123_TCP_ADDR: "flink-master"
             FLINK_MASTER_PORT_6123_TCP_PORT: "6123"
             INIT_DAEMON_BASE_URI: "http://backend/init-daemon"
-        depends_on:
-         - elasticsearch
         networks:
           - pilot-sc4-net
 
@@ -129,11 +127,12 @@ services:
         image: bde2020/sc4-elasticsearch
         hostname: elasticsearch
         container_name: sc4-elasticsearch
-#        build:
-#            context: sc4-elasticsearch/
+        build:
+            context: sc4-elasticsearch/
         environment:
             VIRTUAL_HOST: elasticsearch.big-data-europe.local
             VIRTUAL_PORT: "9200"
+            cluster.name: elasticsearch
         ports:
             - 9200:9200
             - 9300:9300
