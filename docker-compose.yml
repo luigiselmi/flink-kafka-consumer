@@ -82,6 +82,9 @@ services:
 
     fcd-consumer:
         image: bde2020/pilot-sc4-monitoring:v0.10.1
+        build:
+            context: .
+            dockerfile: Dockerfile
         hostname: consumer
         container_name: fcd-consumer
         environment:
