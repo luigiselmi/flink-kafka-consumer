@@ -4,7 +4,7 @@
 # average speed in each road segment. Finally the data is sent to Elasticsearch (Flink sink). 
 # 1) Build an image using this docker file. Run the following docker command
 # 
-#    $ docker build -t bde2020/pilot-sc4-monitoring:v0.1.0 .
+#    $ docker build -t bde2020/pilot-sc4-monitoring:v0.10.0 .
 #
 # 2) Run a container and submit the application to the Flink Job Manager.
 #

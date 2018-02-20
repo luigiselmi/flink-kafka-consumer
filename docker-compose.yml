@@ -40,7 +40,7 @@ services:
             - "8081"
             - "8080"
         environment:
-#            SERVICE_PRECONDITION: "namenode:50070 datanode:50075 resourcemanager:8088"
+#           SERVICE_PRECONDITION: "namenode:50070 datanode:50075 resourcemanager:8088"
             CSS_SOURCE: "flink-dashboard"
             ENABLE_INIT_DAEMON: "false"
             INIT_DAEMON_STEP: "setup_flink"
@@ -69,7 +69,7 @@ services:
           - pilot-sc4-net
 
     fcd-producer:
-        image: bde2020/pilot-sc4-fcd-producer:v0.1.0
+        image: bde2020/pilot-sc4-fcd-producer:v0.10.0
         hostname: fcd-producer
         container_name: fcd-producer
         restart: unless-stopped
@@ -81,9 +81,9 @@ services:
           - pilot-sc4-net
 
     fcd-consumer:
-        image: bde2020/pilot-sc4-monitoring:v0.1.0
-        hostname: consumer
-        container_name: sc4-consumer
+        image: bde2020/pilot-sc4-monitoring:v0.10.0
+        hostname: fcd-consumer
+        container_name: fcd-consumer
         environment:
             SERVICE_PRECONDITION: "kafka:9092 elasticsearch:9200"
             FLINK_MASTER: "flink-master"
@@ -93,11 +93,13 @@ services:
             FLINK_MASTER_PORT_6123_TCP_ADDR: "flink-master"
             FLINK_MASTER_PORT_6123_TCP_PORT: "6123"
             INIT_DAEMON_BASE_URI: "http://backend/init-daemon"
+        depends_on:
+         - elasticsearch
         networks:
           - pilot-sc4-net
 
     postgis:
-        image: bde2020/pilot-sc4-postgis:v0.1.0
+        image: bde2020/pilot-sc4-postgis:v0.10.0
         hostname: postgis
         container_name: postgis
         restart: unless-stopped
@@ -109,7 +111,7 @@ services:
           - pilot-sc4-net
 
     rserve:
-       image: bde2020/pilot-sc4-rserve:v0.1.0
+       image: bde2020/pilot-sc4-rserve:v0.10.0
        hostname: rserve
        container_name: rserve
        restart: unless-stopped
