@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -e
+
+export IMOK=$(echo ruok | nc localhost 2181)
+if [[ "$IMOK" == "imok" ]]; then
+    exit 0
+else
+    exit 1
+fi
