@@ -9,11 +9,12 @@ echo `date` $0
     echo XXX $0 initialisation finished, service is healthy
     curl -XPUT "localhost:9200/thessaloniki"
     echo XXX $0 index created
-    curl -XPUT "localhost:9200/thessaloniki/_mapping/floating-cars" -H'Content-Type: application/json' -d "@/elasticsearch-schema.json"
+    curl -XPUT "localhost:9200/thessaloniki/_mapping/floating-cars" -d "@/elasticsearch_fcd_mapping.json"
     echo XXX $0 mapping schema defined
 ) &
     
 echo $0 
+
 
 exec bin/elasticsearch
 
