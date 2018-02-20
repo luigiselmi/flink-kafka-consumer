@@ -52,8 +52,8 @@
     </dependency>
     <dependency>
         <groupId>org.apache.flink</groupId>
-        <artifactId>flink-connector-elasticsearch2_${scala.binary.version}</artifactId>
-        <version>${flink.version}</version>
+        <artifactId>flink-connector-elasticsearch2_2.11</artifactId>
+        <version>1.2.1</version>
     </dependency>
     <dependency>
         <groupId>junit</groupId>
