@@ -237,7 +237,7 @@ public class FlinkFcdConsumerElasticsearch {
 		// This instructs the sink to emit after every element, otherwise they would be
 		// buffered
 		config.put("bulk.flush.max.actions", "1");
-		config.put("cluster.name", "pilot-sc4");
+		config.put("cluster.name", "elasticsearch");
 
 		List<InetSocketAddress> transports = new ArrayList<InetSocketAddress>();
 		log.info("XXXXX (InetAddress.getByName(elasticsearch), 9300))");
