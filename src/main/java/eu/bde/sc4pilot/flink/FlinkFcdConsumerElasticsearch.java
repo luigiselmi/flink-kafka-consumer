@@ -31,6 +31,7 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010;
 import org.apache.flink.util.Collector;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Requests;
+import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
@@ -202,7 +203,8 @@ public class FlinkFcdConsumerElasticsearch {
       meanLongitude = meanLongitude / count;
       meanLatitude = meanLatitude / count;
       
-      DateTimeFormatter timeFormatter =ISODateTimeFormat.dateHourMinuteSecond();
+      //DateTimeFormatter timeFormatter =ISODateTimeFormat.dateHourMinuteSecond();
+      DateTimeFormatter timeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
       String timestamp = timeFormatter.print(window.getEnd());
       out.collect(new Tuple6<>(roadSegmentId,meanLongitude, meanLatitude, averageSpeed, count, timestamp));
       System.out.println(roadSegmentId + ", " + meanLongitude + ", " + meanLatitude + ", " + averageSpeed + ", " + count + ", " + timestamp);
