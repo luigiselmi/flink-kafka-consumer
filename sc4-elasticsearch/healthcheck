@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -e
+
+export R=$( (curl -fs localhost:9200) > /dev/null && echo ok )
+
+echo elasticsearch $0 $R
+
+if [[ "$R" == "ok" ]]; then
+    exit 0
+else
+    exit 1
+fi
