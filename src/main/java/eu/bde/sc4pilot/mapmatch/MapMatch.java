@@ -59,7 +59,7 @@ public class MapMatch {
       c.assign("gpsdata", REXP.createDataFrame(l));
       //c.voidEval("initgps<-initGpsData(gpsdata)");
       //c.voidEval("gdata<-readGpsData(gpsdata)");
-      RList matches = c.eval("match(gdata,'postgis',5432,'thessaloniki','postgres','$POSTGREES_PASSWORD')").asList();
+      RList matches = c.eval("match(gdata,'postgis',5432,'thessaloniki','postgres','password')").asList();
       matchedRecords = util.createListFromRList(matches);
       
     } catch (RserveException e) {   

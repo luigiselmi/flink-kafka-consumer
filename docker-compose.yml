@@ -95,6 +95,7 @@ services:
             SERVICE_PRECONDITION: "kafka:9092 elasticsearch:9200"
             FLINK_MASTER: "flink-master"
             REQUEST_SLOTS: 1
+            POSTGRES_PASSWORD: "password"
             ENABLE_INIT_DAEMON: "false"
             INIT_DAEMON_STEP: floating_consumer
             FLINK_MASTER_PORT_6123_TCP_ADDR: "flink-master"
@@ -111,7 +112,7 @@ services:
         ports:
            - "5432:5432"
         environment:
-          - POSTGRES_PASSWORD="password"
+          - POSTGRES_PASSWORD=password
         networks:
           - pilot-sc4-net
 
@@ -123,7 +124,7 @@ services:
        ports:
          - "6311:6311"
        environment:
-         - POSTGRES_PASSWORD="password"
+         - POSTGRES_PASSWORD=password
        depends_on:
          - postgis
        networks:
