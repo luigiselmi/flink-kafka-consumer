@@ -29,4 +29,4 @@ USER elasticsearch
 ENV discovery.type=single-node
 ENV cluster.name=elasticsearch
 
-CMD [ "/elasticsearch-startup.sh" ]
+CMD ["sh", "/elasticsearch-startup.sh" ]
