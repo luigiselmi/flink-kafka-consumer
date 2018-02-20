@@ -85,9 +85,10 @@ services:
           - pilot-sc4-net
 
     fcd-consumer:
-        image: bde2020/pilot-sc4-monitoring:v0.10.1
+        image: bde2020/pilot-sc4-monitoring:v0.10.0
         build:
             context: .
+            dockerfile: sc4-monitor.dockerfile
         hostname: consumer
         container_name: fcd-consumer
         environment:
