@@ -62,10 +62,10 @@ index pattern must match with the index name used. In our example the index name
 as in the path used to create the index. Elasticsearch provides a web map server (WMS) that is used by default 
 in Kibana. The defualt WMS doesn't allow to zoom beyond a certain level. A more detailed view can be achieved 
 using other WMS like [Mundialis WMS](https://www.mundialis.de/en/ows-mundialis/). The default WMS can be changed 
-in the 'Options' of the Tile Map visualization,  setting the new WMS url (e.g. http://ows.mundialis.de/services/service?) 
+in the 'Options' of the Tile Map visualization,  setting the new WMS url (e.g. http&#58;//ows.mundialis.de/services/service?) 
 and the layer (such as TOPO-OSM-WMS). For further instructions on how to use Kibana please visit [Getting started with Kibana](https://www.elastic.co/guide/en/kibana/current/getting-started.html) 
 to learn how to create different types of visualizations such as vertical bar charts, pie charts, tile maps and more. 
-Check the format of the date used by Kibana and change in case it is different from the one used in your data. 
+Check the format of the date used by Kibana and change it in case it is different from the one used in your data. 
  
 
 ## License 
