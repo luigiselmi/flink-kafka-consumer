@@ -67,6 +67,7 @@ further instructions on how to use Kibana please visit [Getting started with Kib
 to learn how to create different types of visualizations such as vertical bar charts, pie charts, tile maps and more. 
 Check the format of the date used by Kibana and change it in case it is different from the one used in your data. 
  
+![Thessaloniki Tile Map 23rd Feb. 2018](https://github.com/big-data-europe/pilot-sc4-flink-kafka-consumer/blob/master/Thessaloniki-Tilemap-2018-02-03.png)
 
 ## License 
-TBD
+Apache 2.0 
