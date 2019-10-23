@@ -1,0 +1,13 @@
+{
+  "floating-cars" : {
+    "properties" : {
+       "roadsegmentid" : {"type": "string"},
+       "timestamp" : {"type": "date",
+                      "format": "yyyy-MM-dd HH:mm:ss"
+                     },
+       "location" : {"type": "geo_point"},
+       "speed" : {"type": "double"},
+       "count" : {"type": "integer"}
+   }
+ }
+}

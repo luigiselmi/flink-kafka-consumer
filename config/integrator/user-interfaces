@@ -1,0 +1,19 @@
+{ "data": [
+  {
+    "id": 1,
+    "type": "user-interfaces",
+    "attributes": {
+      "label": "Apache Flink Dashboard",
+      "base-url": "http://flink-master.big-data-europe.local"
+    }
+  },
+  {
+    "id": 4,
+    "type": "user-interfaces",
+    "attributes": {
+      "label": "Kibana",
+      "base-url": "http://kibana.big-data-europe.local",
+      "append-path": ""
+    }
+  }]
+}

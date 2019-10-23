@@ -26,7 +26,7 @@ public class GpsJsonReaderTest {
   @Test
   public void testGetGpsRecord() {
     List<GpsRecord> records = GpsJsonReader.getGpsRecords(jsonString);
-    Assert.assertTrue("Wrong records found", "2016-04-08 12:05:47.600".equals(records.get(0).getTimestamp()));
+    Assert.assertTrue("Wrong records found", "2016-05-13 11:41:24.653".equals(records.get(0).getTimestamp()));
   }
 
 }

@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -e
+
+export R=$( (nc -z localhost 9092) && echo ok )
+
+if [[ "$R" == "ok" ]]; then
+    if [[ -z "$INITIAL_TOPICS" ]] ;then
+        exit 0
+    else
+        test -e /INITIAL_TOPICS_AVAILABLE
+        exit $?
+    fi
+    exit 0
+else
+    exit 1
+fi

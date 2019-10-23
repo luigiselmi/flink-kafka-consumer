@@ -1,0 +1,14 @@
+{"namespace": "eu.bde.pilot.sc4.fcd",
+ "type": "record",
+ "name": "FcdTaxiEvent",
+ "fields": [
+     {"name": "device_id", "type": "int"},
+     {"name": "timestamp", "type": "string"},
+     {"name": "lon", "type": "double"},
+     {"name": "lat", "type": "double"},
+     {"name": "altitude", "type": "double"},
+     {"name": "speed", "type": "double"},
+     {"name": "orientation", "type": "double"},
+     {"name": "transfer", "type": "int"}
+ ]
+}

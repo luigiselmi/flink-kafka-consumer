@@ -1,15 +1,36 @@
 package eu.bde.sc4pilot.json;
 
 public class GpsRecord {
-  
+  private String jsonString; 
+  private int deviceId = -1;
   private double lat = 0.0;
   private double lon = 0.0;
   private double altitude = 0.0;
-  private double speed = 0.0;
+  private int speed = 0;
   private double orientation = 0.0;
-  private String jsonString; 
+  private int transfer = 0;
   private String timestamp = "";
+  private String link;
   
+  
+  public int getTransfer() {
+    return transfer;
+  }
+  public void setTransfer(int transfer) {
+    this.transfer = transfer;
+  }
+  public int getDeviceId() {
+    return deviceId;
+  }
+  public void setDeviceId(int deviceId) {
+    this.deviceId = deviceId;
+  }
+  public String getLink() {
+    return link;
+  }
+  public void setLink(String link) {
+    this.link = link;
+  }
   public String getTimestamp() {
     return timestamp;
   }
@@ -34,10 +55,10 @@ public class GpsRecord {
   public void setAltitude(double altitude) {
     this.altitude = altitude;
   }
-  public double getSpeed() {
+  public int getSpeed() {
     return speed;
   }
-  public void setSpeed(double speed) {
+  public void setSpeed(int speed) {
     this.speed = speed;
   }
   public double getOrientation() {
