@@ -58,7 +58,7 @@
     <dependency>
           <groupId>org.elasticsearch</groupId>
           <artifactId>elasticsearch</artifactId>
-          <version>2.4.6</version>
+          <version>6.8.13</version>
           <scope>compile</scope>
         </dependency>
     <dependency>
@@ -167,7 +167,7 @@
 	<dependency>
           <groupId>org.elasticsearch</groupId>
           <artifactId>elasticsearch</artifactId>
-          <version>2.4.6</version>
+          <version>6.8.13</version>
           <scope>compile</scope>
         </dependency>
    
