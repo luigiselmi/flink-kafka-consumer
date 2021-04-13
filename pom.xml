@@ -25,17 +25,17 @@
   		<artifactId>flink-streaming-java_${scala.binary.version}</artifactId>
   		<version>${flink.version}</version>
    	</dependency> 
-	<dependency>
+	  <dependency>
   		<groupId>org.apache.flink</groupId>
   		<artifactId>flink-clients_${scala.binary.version}</artifactId>
   		<version>${flink.version}</version>
-	</dependency>
-	<dependency>
+	  </dependency>
+	  <dependency>
   		<groupId>org.apache.flink</groupId>
   		<artifactId>flink-connector-kafka-0.10_${scala.binary.version}</artifactId>
 			<version>${flink.version}</version>
-	</dependency>
-	<dependency>
+	  </dependency>
+	  <dependency>
       <groupId>net.rforge</groupId>
       <artifactId>Rserve</artifactId>
       <version>0.6-8.1</version>
@@ -48,7 +48,7 @@
     <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>19.0</version>
+        <version>[30.0-jre,)</version>
     </dependency>
     <dependency>
         <groupId>org.apache.flink</groupId>
@@ -58,13 +58,13 @@
     <dependency>
           <groupId>org.elasticsearch</groupId>
           <artifactId>elasticsearch</artifactId>
-          <version>2.4.6</version>
+          <version>7.10.1</version>
           <scope>compile</scope>
         </dependency>
     <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.11</version>
+        <version>[4.13.1,)</version>
         <scope>test</scope>
     </dependency>
     <dependency>
@@ -88,53 +88,16 @@
 	   <version>2.7</version>
 	</dependency>
 	<dependency>
-        <groupId>org.apache.avro</groupId>
-        <artifactId>avro</artifactId>
-        <version>1.8.1</version>
-      </dependency>
-      <dependency>
-        <groupId>com.twitter</groupId>
-        <artifactId>bijection-avro_2.10</artifactId>
-        <version>0.9.2</version>
-      </dependency>
+    <groupId>org.apache.avro</groupId>
+    <artifactId>avro</artifactId>
+    <version>1.8.1</version>
+  </dependency>
+  <dependency>
+     <groupId>com.twitter</groupId>
+     <artifactId>bijection-avro_2.10</artifactId>
+     <version>0.9.2</version>
+  </dependency>
   </dependencies>
-  <!-- build>
-  <finalName>${finalName}</finalName>
-  <plugins>
-    <plugin>
-         <groupId>org.apache.maven.plugins</groupId>
-         <artifactId>maven-assembly-plugin</artifactId>
-         <executions>
-             <execution>
-                 <goals>
-                     <goal>single</goal>
-                 </goals>
-                 <phase>package</phase>
-                 <configuration>
-                     <descriptorRefs>              
-                         <dedescriptorRef>jar-with-dependencies</dedescriptorRef>
-                     </descriptorRefs>
-                     <archive>
-                         <manifest>
-                             <mainClass>${main.class}</mainClass>
-                         </manifest>
-                     </archive>
-                 </configuration>
-             </execution>
-         </executions>
-     </plugin>
-     <plugin>
-         <groupId>org.apache.maven.plugins</groupId>
-         <artifactId>maven-compiler-plugin</artifactId>
-         <version>2.3.2</version>
-         <configuration>
-             <source>1.8</source>
-             <target>1.8</target>
-         </configuration>
-        
-     </plugin>
-       </plugins>
-  </build-->
   <profiles>
 		<profile>
 			<!-- Profile for packaging correct JAR files -->
@@ -142,37 +105,34 @@
 			<activation>
 				<activeByDefault>false</activeByDefault>
 			</activation>
-			<dependencies>
+		  <dependencies>
 				<dependency>
-			<groupId>org.apache.flink</groupId>
-			<artifactId>flink-java</artifactId>
-			<version>${flink.version}</version>
-		</dependency>
-   	<dependency>
-  		<groupId>org.apache.flink</groupId>
-  		<artifactId>flink-streaming-java_${scala.binary.version}</artifactId>
-  		<version>${flink.version}</version>
-   	</dependency> 
-	<dependency>
-  		<groupId>org.apache.flink</groupId>
-  		<artifactId>flink-clients_${scala.binary.version}</artifactId>
-  		<version>${flink.version}</version>
-	</dependency>
-	<dependency>
-  		<groupId>org.apache.flink</groupId>
-  		<artifactId>flink-connector-kafka-0.10_${scala.binary.version}</artifactId>
-			<version>${flink.version}</version>
- 
-	</dependency>
-	<dependency>
+			    <groupId>org.apache.flink</groupId>
+			    <artifactId>flink-java</artifactId>
+			    <version>${flink.version}</version>
+		    </dependency>
+   	    <dependency>
+  		    <groupId>org.apache.flink</groupId>
+  		    <artifactId>flink-streaming-java_${scala.binary.version}</artifactId>
+  		    <version>${flink.version}</version>
+   	    </dependency> 
+  	    <dependency>
+  		    <groupId>org.apache.flink</groupId>
+  		    <artifactId>flink-clients_${scala.binary.version}</artifactId>
+  		    <version>${flink.version}</version>
+	      </dependency>
+	      <dependency>
+  		    <groupId>org.apache.flink</groupId>
+  		    <artifactId>flink-connector-kafka-0.10_${scala.binary.version}</artifactId>
+			    <version>${flink.version}</version>
+	      </dependency>
+	      <dependency>
           <groupId>org.elasticsearch</groupId>
           <artifactId>elasticsearch</artifactId>
-          <version>2.4.6</version>
+          <version>7.10.1</version>
           <scope>compile</scope>
-        </dependency>
-   
-			</dependencies>
-
+        </dependency> 
+	    </dependencies>
 			<build>
 				<plugins>
 					<!-- disable the exclusion rules -->
@@ -318,7 +278,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -331,6 +290,7 @@
 			<plugin>
          <groupId>org.apache.maven.plugins</groupId>
          <artifactId>maven-assembly-plugin</artifactId>
+         <version>3.3.0</version>
          <executions>
              <execution>
                  <goals>
@@ -351,69 +311,5 @@
          </executions>
      </plugin>
 		</plugins>
-		
-			
-		<!-- If you want to use Java 8 Lambda Expressions uncomment the following lines -->
-		<!--
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<configuration>
-						<source>1.8</source>
-						<target>1.8</target>
-						<compilerId>jdt</compilerId>
-					</configuration>
-					<dependencies>
-						<dependency>
-							<groupId>org.eclipse.tycho</groupId>
-							<artifactId>tycho-compiler-jdt</artifactId>
-							<version>0.21.0</version>
-						</dependency>
-					</dependencies>
-				</plugin>
-		
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.apache.maven.plugins</groupId>
-										<artifactId>maven-assembly-plugin</artifactId>
-										<versionRange>[2.4,)</versionRange>
-										<goals>
-											<goal>single</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore/>
-									</action>
-								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.apache.maven.plugins</groupId>
-										<artifactId>maven-compiler-plugin</artifactId>
-										<versionRange>[3.1,)</versionRange>
-										<goals>
-											<goal>testCompile</goal>
-											<goal>compile</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore/>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-		-->
-		
 	</build>
 </project>
